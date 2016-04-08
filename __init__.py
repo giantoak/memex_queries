@@ -1,6 +1,4 @@
-from HelperFuncs import hbase_row_value
-from HelperFuncs import image_hash
-from HelperFuncs import timestamp_for_cdr_id
+from HelperFuncs import all_timestamps_for_cdr_image
 
 
 def query_one(image_id, es=None):
@@ -15,19 +13,10 @@ def query_one(image_id, es=None):
     If that doesn't work, hit elastic
     :todo: Use Lattice's extracted post data, not Svebor's table.
     :todo: Make default more efficient by hitting elastic with all ads at once
-    :param str image_id: The image_id to retrieve
+    :param str image_id: The CDR ID of the image to retrieve
     :param elasticsearch.Elasticsearch es: the elasticsearch index to search
     """
-    cur_hash = image_hash(image_id, es)
+    return min(all_timestamps_for_cdr_image(image_id, es))
 
-    # Check Svebor's table for a copy of the hashed image, and get the other
-    # images.
-    ad_ids = hbase_row_value('ht_images_infos_2016',
-                             cur_hash,
-                             'info:all_parent_ids')
 
-    if ad_ids is None:
-        # We don't have a fallback for this, as yet.
-        return None
 
-    return min([timestamp_for_cdr_id(ad_id) for ad_id in ad_ids.split(',')])

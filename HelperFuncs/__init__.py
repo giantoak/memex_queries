@@ -118,7 +118,7 @@ def image_hash(image_id, es=None):
 def timestamp_for_cdr_id(cdr_id, es=None):
     """
     Return the timestamp for this CDR ID
-    :param str cdr_id:
+    :param str cdr_id: An entity's CDR ID
     :param elasticsearch.Elasticsearch es:
     :returns int:
     """
@@ -142,3 +142,30 @@ def timestamp_for_cdr_id(cdr_id, es=None):
         return data_dict['hits']['hits'][0]['_source']['timestamp']
     
     return None
+
+
+def all_timestamps_for_cdr_image(image_id, es=None):
+    """
+    Given the ID of an image in the CDR, get all of the timestamps on which it was used.
+    :param str image_id: The CDR ID of an image
+    :param elasticsearch.Elasticsearch es:
+    :return list: A list of timestamps since the epoch on which the timestamp was used.
+    """
+    cur_hash = image_hash(image_id, es)
+
+    # Check Svebor's table for a copy of the hashed image, and get the other
+    # images.
+    ad_ids = hbase_row_value('ht_images_infos_2016',
+                             cur_hash,
+                             'info:all_parent_ids')
+    if ad_ids is not None:
+        return ad_ids.split(',')
+
+    # Our fallback is to hit elastic and get every parent of the current image
+    if es is None:
+        es = new_elasticsearch()
+
+    data_dict = es.search(body=must_bool_filter_query({'_id': image_id}),
+                          filter_path=['hits.hits'],
+                          fields=['obj_parent'])
+    return [x['fields']['object_parent'] for x in data_dict['hits']['hits']]
