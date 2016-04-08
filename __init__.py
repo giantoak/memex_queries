@@ -19,4 +19,31 @@ def query_one(image_id, es=None):
     return min(all_timestamps_for_cdr_image(image_id, es))
 
 
+def query_eleven(image_id, epochtime=None, es=None):
+    """
+    Goal: For a given image posted at a certain time, how long has it been since the image was last posted?
+    :param str image_id: The CDR ID of the image to retrieve
+    :param int epochtime: if None, assume we're talking about the gap between the most and second-most recent instance
+    if an int, find the first timestamp BEFORE the one provided.
+    :param elasticsearch.Elasticsearch es:
+    :return int: epochtime since the last posting
+    """
+    ad_timestamps = sorted(all_timestamps_for_cdr_image(image_id, es))
+
+    if epochtime is None:
+        # If there's been no postings, the gap is infinite
+        if len(ad_timestamps) < 1:
+            return None
+
+        # If there's been one posting, the gap is 0
+        if len(ad_timestamps) < 2:
+            return 0
+
+        return ad_timestamps[-1] - ad_timestamps[-2]
+
+    for ts in ad_timestamps[::-1]:
+        if ts < epochtime:
+            return epochtime - ts
+
+    return 0
 
