@@ -144,9 +144,9 @@ def timestamp_for_cdr_id(cdr_id, es=None):
     return None
 
 
-def all_timestamps_for_cdr_image(image_id, es=None):
+def all_ad_ids_for_cdr_image_id(image_id, es=None):
     """
-    Given the ID of an image in the CDR, get all of the timestamps on which it was used.
+    Given the ID of an image in the CDR, get all of the ads in which it was used.
     :param str image_id: The CDR ID of an image
     :param elasticsearch.Elasticsearch es:
     :return list: A list of timestamps since the epoch on which the timestamp was used.
@@ -169,3 +169,25 @@ def all_timestamps_for_cdr_image(image_id, es=None):
                           filter_path=['hits.hits'],
                           fields=['obj_parent'])
     return [x['fields']['object_parent'] for x in data_dict['hits']['hits']]
+
+
+def all_timestamps_for_cdr_image(image_id, es=None):
+    """
+    Given the ID of an image in the CDR, get all of the timestamps on which it was used.
+    :param str image_id: The CDR ID of an image
+    :param elasticsearch.Elasticsearch es:
+    :return list: A list of timestamps since the epoch on which the timestamp was used.
+    """
+
+    ad_ids = all_ad_ids_for_cdr_image_id(image_id, es=None)
+
+    # Ad data _only_ lives in the CDR.
+    # This should, however, get swapped for the lattice dumps, which have the extractions we need.
+    if es is None:
+        es = new_elasticsearch()
+
+    data_dict = es.search(body=must_bool_filter_query({'_id': ad_ids}),
+                          filter_path=['hits.hits'],
+                          fields=['timestamp'],
+                          size=len(ad_ids))
+    return [x['fields']['timestamp'] for x in data_dict['hits']['hits']]
