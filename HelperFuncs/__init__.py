@@ -1,14 +1,16 @@
 ES_URL = 'els.istresearch.com:19200/memex-domains'
 ES_INDEX = 'escorts'
 ES_AUTH_TUPLE = ('memex', 'qRJfu2uPkMLmH9cp')
-HBASE_URL = 'memex-hbase-master:8080'
-local_es = None
-
 es_url = 'https://{}:{}@{}/{}/'.format(ES_AUTH_TUPLE[0],
                                        ES_AUTH_TUPLE[1],
                                        ES_URL,
                                        ES_INDEX)
+local_es = None
 
+HBASE_URL = 'memex-hbase-master:8080'
+
+SQLITE_FILE = 'dd_dump.db'
+local_sqlite = None
 
 def must_bool_filter_query(query_dict):
     """
@@ -39,6 +41,20 @@ def new_elasticsearch():
         local_es = Elasticsearch(es_url)
 
     return local_es
+
+
+def new_sqlite_con():
+    """
+
+    :return sqlalchemy.create_engine:
+    """
+    from sqlalchemy import create_engine
+
+    global local_sqlite
+    if local_sqlite is None:
+        local_sqlite = create_engine('s3:///{}'.format(SQLITE_FILE))
+
+    return local_sqlite
 
 
 def hbase_row_value(table, row_id, key_id):
@@ -73,6 +89,22 @@ def dd_id_df(cdr_ids):
     from pandas import DataFrame
     return DataFrame({'cdr_id': cdr_ids,
                       'dd_id': [dd_id(cdr_id) for cdr_id in cdr_ids]})
+
+
+def get_phones_for_dd_ids(dd_ids, sql_con=None):
+    """
+
+    :param dd_ids:
+    :return pandas.DataFrame:
+    """
+    from pandas import read_sql
+
+    if sql_con is None:
+        sql_con = new_sqlite_con()
+
+    query = 'select * from dd_id_to_phone where dd_id in ({})'.format(str(dd_ids)[1:-1])
+
+    return read_sql(query, sql_con)
 
 
 def image_stored_url(image_id, es=None):
