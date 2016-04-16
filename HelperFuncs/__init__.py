@@ -12,9 +12,9 @@ es_url = 'https://{}:{}@{}/{}/'.format(ES_AUTH_TUPLE[0],
 
 def must_bool_filter_query(query_dict):
     """
-    Takes a dict of paramters and returns a matching boolean filter
+    Takes a dict of parameters and returns a matching boolean filter
     :param dict query_dict:
-    :returns dict:
+    :return dict:
     """
     return {
         "filter": {
@@ -27,7 +27,12 @@ def must_bool_filter_query(query_dict):
     }
 
 
+
 def new_elasticsearch():
+    """
+
+    :return elasticsearch.Elasticsearch:
+    """
     from elasticsearch import Elasticsearch
     global local_es
     if local_es is None:
@@ -41,7 +46,7 @@ def hbase_row_value(table, row_id, key_id):
     :param str table: The name of the MEMEX HBase table
     :param str row_id: The row to get from the table
     :param str key_id: The key to get from the row
-    :returns str: the value in the desired key, or None
+    :return str: the value in the desired key, or None
     """
     import requests
     try:
@@ -93,7 +98,7 @@ def image_hash(image_id, es=None):
     If we can't find it, calculate the hash.
     :param str image_id:
     :param elasticsearch.Elasticsearch es:
-    :returns str:
+    :return str:
     """
     import requests
 
@@ -120,7 +125,7 @@ def timestamp_for_cdr_id(cdr_id, es=None):
     Return the timestamp for this CDR ID
     :param str cdr_id: An entity's CDR ID
     :param elasticsearch.Elasticsearch es:
-    :returns int:
+    :return int:
     """
     data_str = hbase_row_value('dig_isi_cdr2_ht_images',
                                    cdr_id,
