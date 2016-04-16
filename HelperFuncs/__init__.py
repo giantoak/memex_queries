@@ -60,6 +60,21 @@ def hbase_row_value(table, row_id, key_id):
     return None
 
 
+def dd_id(cdr_id):
+    """
+    Query HBase to to get the Lattice / Deep Dive Dump ID that maps to the corresponding CDR ID
+    :param str cdr_id:
+    :return str:
+    """
+    return hbase_row_value('cdr_id_to_dd_id', cdr_id, 'info:dd_id')
+
+
+def dd_id_df(cdr_ids):
+    from pandas import DataFrame
+    return DataFrame({'cdr_id': cdr_ids,
+                      'dd_id': [dd_id(cdr_id) for cdr_id in cdr_ids]})
+
+
 def image_stored_url(image_id, es=None):
     """
     Checks various MEMEX sources for the location at which a particular
