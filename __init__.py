@@ -27,7 +27,9 @@ def query_two(image_id):
     :param str image_id: The CDR ID of the image to retrieve
     :return:
     """
-    ad_ids = all_ad_ids_for_cdr_image_id(image_id)
+    dd_ad_ids = [dd_id(x) for x in all_ad_ids_for_cdr_image_id(image_id)]
+
+
 
     # Hit table for lattice IDs
     # Hit lattice IDs for post times and phone numbers
@@ -44,7 +46,8 @@ def query_three(image_id, phone_number, timestamp):
     :param timestamp:
     :return:
     """
-    ad_ids = all_ad_ids_for_cdr_image_id(image_id)
+    dd_ad_ids = [dd_id(x) for x in all_ad_ids_for_cdr_image_id(image_id)]
+
 
     # Hit table for lattice IDs
     # Hit lattice IDs for post dates and phone number
