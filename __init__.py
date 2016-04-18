@@ -36,22 +36,17 @@ def query_two(image_id):
     return set(df.ix[(df.post_date == first_date), 'phone'].values)
 
 
-def query_three(image_id, phone_number, timestamp):
+def query_three(image_id, timestamp):
     """
     For a given image_id at timestamp
     WHAT phone numbers posted ads with image_id at an earlier date?
     :param str image_id: The CDR ID of the image to retrieve
-    :param str phone_number:
     :param timestamp:
     :return:
     """
     dd_ad_ids = [dd_id(x) for x in all_ad_ids_for_cdr_image_id(image_id)]
-
-
-    # Hit table for lattice IDs
-    # Hit lattice IDs for post dates and phone number
-    # Keep data for post dates prior to this one
-    # Return unique set of phone numbers that posted before timestamp
+    df = dd_df_from_sqlite_tables(dd_ad_ids, ['dd_id_to_phone', 'dd_id_to_post_date'])
+    return set(df.ix[df.post_date < timestamp, 'phone'])
 
 
 def query_four(image_id, timestamp):
