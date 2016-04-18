@@ -66,11 +66,8 @@ def query_five(image_id):
     :param str image_id: The CDR ID of the image to retrieve
     :return:
     """
-    ad_ids = all_ad_ids_for_cdr_image_id(image_id)
-
-    # Hit table for lattice IDs
-    # Hit lattice IDs for phone numbers
-    # return set of phone numbers
+    dd_ad_ids = all_ad_ids_for_cdr_image_id(image_id)
+    return set(dd_df_from_sqlite_tables(dd_ad_ids, ['dd_id_to_phone']).phone)
 
 
 def query_six(image_id):
