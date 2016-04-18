@@ -95,10 +95,11 @@ def query_seven(image_id, phone_number, timestamp):
 def query_eight(image_id, phone_number, timestamp):
     """
     For a given image_id posted by phone_number at timestamp,
-    how many phone numbers other than P posted ads with I at an earlier date?
+    HOW MANY phone numbers other than P posted ads with I at an earlier date?
     :param str image_id: The CDR ID of the image to retrieve
     :return:
     """
+    return len(query_seven(image_id, phone_number, timestamp))
 
 
 def query_nine(ad_id, phone_number=None):
