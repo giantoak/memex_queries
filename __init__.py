@@ -57,8 +57,7 @@ def query_four(image_id, timestamp):
 
     :return:
     """
-    # Hit query_three for all of the other ads
-    # return the count of the query.
+    return len(query_three(image_id, timestamp))
 
 
 def query_five(image_id):
