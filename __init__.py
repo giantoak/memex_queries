@@ -78,13 +78,18 @@ def query_six(image_id):
     """
     return len(query_five(image_id))
 
-def query_seven(image_id):
+
+def query_seven(image_id, phone_number, timestamp):
     """
     For a given image_id posted by phone_number at timestamp
     what phone numbers OTHER THAN PHONE_NUMBER posted ads with image_id at an earlier date?
     :param str image_id: The CDR ID of the image to retrieve
+    :param str phone_number:
     :return:
     """
+    dd_ad_ids = all_ad_ids_for_cdr_image_id(image_id)
+    df = dd_df_from_sqlite_tables(dd_ad_ids, ['dd_id_to_phone', 'dd_id_to_post_date'])
+    return set(df.ix[(df.phone != phone_number) & df.timestamp < timestamp, 'phone'].values)
 
 
 def query_eight(image_id, phone_number, timestamp):
