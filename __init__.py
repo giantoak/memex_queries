@@ -1,5 +1,7 @@
 from HelperFuncs import all_timestamps_for_cdr_image
 from HelperFuncs import all_ad_ids_for_cdr_image_id
+from HelperFuncs import dd_df_from_sqlite_tables
+from HelperFuncs import dd_id
 
 
 def query_one(image_id, es=None):
@@ -28,13 +30,10 @@ def query_two(image_id):
     :return:
     """
     dd_ad_ids = [dd_id(x) for x in all_ad_ids_for_cdr_image_id(image_id)]
+    df = dd_df_from_sqlite_tables(dd_ad_ids, ['dd_id_to_phone', 'dd_id_to_post_date'])
+    first_date = df.post_date.min()
 
-
-
-    # Hit table for lattice IDs
-    # Hit lattice IDs for post times and phone numbers
-    # Return phone numbers for first day(s)
-    # Swap Elastic here for the deep dive dump
+    return set(df.ix[(df.post_date == first_date), 'phone'].values)
 
 
 def query_three(image_id, phone_number, timestamp):
