@@ -76,8 +76,7 @@ def query_six(image_id):
     :param str image_id: The CDR ID of the image to retrieve
     :return:
     """
-    # Hit query_five for phone numbers
-    # Return count
+    return len(query_five(image_id))
 
 def query_seven(image_id):
     """
