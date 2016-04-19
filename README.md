@@ -3,14 +3,16 @@
 This repository contains a module calculate stats against a wide variety of MEMEX escort data. It is organized as follows:
 
 ## Python stuff
-
-* `memex_queries/__init__.py`: Top-level queries to run against the data: this should be used for answering questions related to specific fields or collections of fields:
+### [`memex_queries/__init__.py`](https://github.com/giantoak/memex_queries/blob/master/memex_queries/__init__.py)
+Top-level queries to run against the data: these should be used for answering questions related to specific fields or collections of fields:
 ```
 > # Sample use:
 > new_pd_series = pd_series.apply(memex_query_one)
 > new_pd_dataframe = pd_dataframe.apply(memex_query_two)
 ```
-* `memex_queries/HelperFuncs`: Lower-level helper functions that can be used as components of high-level queries. These should facilitate hitting particular MEMEX resources ([Elasticsearch,](https://www.elastic.co/products/elasticsearch) [HBase,](https://hbase.apache.org/) *perhaps eventually* [Hive](https://hive.apache.org/)/[Impala](http://impala.io/)). DeepDive data is currently stored locally, within a [SQLite](https://www.sqlite.org) database.
+
+### [`memex_queries/HelperFuncs`](https://github.com/giantoak/memex_queries/tree/master/memex_queries/HelperFuncs)
+Lower-level helper functions that can be used as components of high-level queries. These should facilitate hitting particular MEMEX resources ([Elasticsearch,](https://www.elastic.co/products/elasticsearch) [HBase,](https://hbase.apache.org/) and perhaps eventually [Hive](https://hive.apache.org/) and [Impala](http://impala.io/)). DeepDive data is currently stored locally, within a [SQLite](https://www.sqlite.org) database.
 ```
 > # Sample high-level query using low-level components:
 > def memex_query_three(image_cdr_id):
@@ -20,23 +22,25 @@ This repository contains a module calculate stats against a wide variety of MEME
 ```
 
 ## Setup stuff
-* `make_dd_sqlite_db.sql`: Load the Deep Dive dump into SQLite.
-* `get_dd_data_load_sb.sh`: Download the Deep Dive dump and call `make_dd_sqlite_db.sql` to ingest it; see [here](https://memexproxy.com/wiki/display/MPM/How+To+Get+Stanford+Memex+S3+Data) for information about configuring your S3 access.
+### [`make_dd_sqlite_db.sql`](https://github.com/giantoak/memex_queries/blob/master/make_dd_sqlite_db.sql)
+Load the Deep Dive dump into SQLite.
+### [`get_dd_data_load_sb.sh`](https://github.com/giantoak/memex_queries/blob/master/get_dd_data_load_db.sh)
+Download the Deep Dive dump and call `make_dd_sqlite_db.sql` to ingest it; see [here](https://memexproxy.com/wiki/display/MPM/How+To+Get+Stanford+Memex+S3+Data) for information about configuring your S3 access.
 
 
 # Writing Queries
 TSV files and CSV files are the bread-and-butter of data science.
 [Pandas](http://pandas.pydata.org/) and [blaze](http://blaze.pydata.org/) are the bread-and-butter of data science in
 Python, and can be used to get things into TSVs and CSVs. As such, queries (or bulk versions of queries) should be written with the expectation that they either:
-* Take data in bulk and&hellip;
+* Take data in bulk and…
   * return a `pandas.DataFrame`, `pandas.Series`, or appropriate `blaze` object.
   * write the results to a CSV or TSV and confirm that it has been written (or failed to be written)
-* Take a single row of data and&hellip;
+* Take a single row of data and…
   * return a `pandas.DataFrame`, `pandas.Series`, or appropriate `blaze` object.
   * return a single row of data.
 
 
-## I don't like SQL and want to stay clear of it.
+## "I don't like SQL and want to stay clear of it."
 The easiest way to do this is create a `DataFrame` by selecting all of the rows in the table:
   ```
   > import pandas as pd
