@@ -21,3 +21,14 @@ workarounds would be welcome, but for now I'd prefer to dump stuff to pandas aft
 *That said*, as currently written the code tends to lean on pandas for calculation. SQL is used for pulling subset
 of ad data, and pandas is for more sophisticated work. This is perhaps not the most efficient way of doing things,
 but it hopefully makes SQL easier to swap out than pandas.
+
+
+# Glossary of terms
+
+Term | Meaning
+:--- |:---
+CDR Ad ID | The `_id` of an advertisement in the CDR.
+CDR Image ID | The `_id` of an image in the CDR. Each image has an ad as its parent
+General CDR Image ID | A notional `_id`; the set of all CDR Image IDs for images that have identical hashes. (That is, that are actually the same image.
+DD ID | The ID of an advertisement in the most recent dump of the Deep Dive Data, a.k.a Lattice Data, a.ka. Stanford Data. (Available at s3://memex-data/escort_cdr_2; see [here](https://memexproxy.com/wiki/display/MPM/How+To+Get+Stanford+Memex+S3+Data) for information about access.)
+
