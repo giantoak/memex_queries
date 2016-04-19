@@ -101,3 +101,10 @@ def post_dates_for_general_cdr_image_id(cdr_image_id, es=None):
     """
     return post_dates_for_cdr_ad_ids(cdr_ad_ids_for_general_cdr_image_id(cdr_image_id, es))
 
+
+def cdr_image_ids_for_dd_ad_id(dd_ad_id):
+    """
+
+    :param int dd_ad_id:
+    :return:
+    """
