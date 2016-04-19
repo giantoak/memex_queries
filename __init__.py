@@ -1,5 +1,5 @@
-from HelperFuncs import all_timestamps_for_cdr_image
-from HelperFuncs import all_ad_ids_for_cdr_image_id
+from HelperFuncs import post_dates_for_general_cdr_image_id
+from HelperFuncs import cdr_ad_ids_for_general_cdr_image_id
 from HelperFuncs import dd_df_from_sqlite_tables
 from HelperFuncs import dd_id
 
@@ -19,7 +19,7 @@ def query_one(image_id, es=None):
     :param str image_id: The CDR ID of the image to retrieve
     :param elasticsearch.Elasticsearch es: the elasticsearch index to search
     """
-    return min(all_timestamps_for_cdr_image(image_id, es))
+    return min(post_dates_for_general_cdr_image_id(image_id, es))
 
 
 def query_two(image_id):
@@ -29,7 +29,7 @@ def query_two(image_id):
     :param str image_id: The CDR ID of the image to retrieve
     :return:
     """
-    dd_ad_ids = [dd_id(x) for x in all_ad_ids_for_cdr_image_id(image_id)]
+    dd_ad_ids = [dd_id(x) for x in cdr_ad_ids_for_general_cdr_image_id(image_id)]
     df = dd_df_from_sqlite_tables(dd_ad_ids, ['dd_id_to_phone', 'dd_id_to_post_date'])
     first_date = df.post_date.min()
 
@@ -44,7 +44,7 @@ def query_three(image_id, timestamp):
     :param timestamp:
     :return:
     """
-    dd_ad_ids = [dd_id(x) for x in all_ad_ids_for_cdr_image_id(image_id)]
+    dd_ad_ids = [dd_id(x) for x in cdr_ad_ids_for_general_cdr_image_id(image_id)]
     df = dd_df_from_sqlite_tables(dd_ad_ids, ['dd_id_to_phone', 'dd_id_to_post_date'])
     return set(df.ix[df.post_date < timestamp, 'phone'])
 
@@ -66,7 +66,7 @@ def query_five(image_id):
     :param str image_id: The CDR ID of the image to retrieve
     :return:
     """
-    dd_ad_ids = all_ad_ids_for_cdr_image_id(image_id)
+    dd_ad_ids = [dd_id(x) for x in cdr_ad_ids_for_general_cdr_image_id(image_id)]
     return set(dd_df_from_sqlite_tables(dd_ad_ids, ['dd_id_to_phone']).phone)
 
 
@@ -87,7 +87,7 @@ def query_seven(image_id, phone_number, timestamp):
     :param str phone_number:
     :return:
     """
-    dd_ad_ids = all_ad_ids_for_cdr_image_id(image_id)
+    dd_ad_ids = [dd_id(x) for x in cdr_ad_ids_for_general_cdr_image_id(image_id)]
     df = dd_df_from_sqlite_tables(dd_ad_ids, ['dd_id_to_phone', 'dd_id_to_post_date'])
     return set(df.ix[(df.phone != phone_number) & df.timestamp < timestamp, 'phone'].values)
 
@@ -130,7 +130,7 @@ def query_eleven(image_id, epochtime=None, es=None):
     :param elasticsearch.Elasticsearch es:
     :return int: epochtime since the last posting
     """
-    ad_timestamps = sorted(all_timestamps_for_cdr_image(image_id, es))
+    ad_timestamps = sorted(post_dates_for_general_cdr_image_id(image_id, es))
 
     if epochtime is None:
         # If there's been no postings, the gap is infinite
