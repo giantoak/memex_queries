@@ -1,34 +1,58 @@
 # memex_queries
 
-This repository contains queries against various MEMEX HBase tables and the MEMEX CDR that return a variety of stats
-against individual images.
-* `__init__.py` contains all of the top-level queries against the data.
-* `HelperFuncs/__init__.py` contains helper functions that hit MEMEX resources (Hbase, Elastic) directly.
+This repository contains a module calculate stats against a wide variety of MEMEX escort data. It is organized as follows:
 
-(Note that, at present, these queries are being optimized for single requests, **NOT** bulk searches. That is, each 
-search for a particular image or ad will hit a sequence of HBase tables or the elastic index multiple times to find results. If we miss a hit on, say, an HBase table, we immediately proceed to hit Elastic; we don't group together all of the misses and *then* hit
- Elastic. We should.)
+## Python stuff
 
+* `memex_queries/__init__.py`: Top-level queries to run against the data: this should be used for answering questions related to specific fields or collections of fields:
+```
+> # Sample use:
+> new_pd_series = pd_series.apply(memex_query_one)
+> new_pd_dataframe = pd_dataframe.apply(memex_query_two)
+```
+* `memex_queries/HelperFuncs`: Lower-level helper functions that can be used as components of high-level queries. These should facilitate hitting particular MEMEX resources ([Elasticsearch,](https://www.elastic.co/products/elasticsearch) [HBase,](https://hbase.apache.org/) *perhaps eventually* [Hive](https://hive.apache.org/)/[Impala](http://impala.io/)). DeepDive data is currently stored locally, within a [SQLite](https://www.sqlite.org) database.
+```
+> # Sample high-level query using low-level components:
+> def memex_query_three(image_cdr_id):
+>   related_ads = get_data_from_cdr(image_cdr_id)
+>   data_related_to_ads = get_data_from_hbase('some_table', related_ads)
+>   return list(data_related_to_ads)
+```
+
+## Setup stuff
+* `make_dd_sqlite_db.sql`: Load the Deep Dive dump into SQLite.
+* `get_dd_data_load_sb.sh`: Download the Deep Dive dump and call `make_dd_sqlite_db.sql` to ingest it; see [here](https://memexproxy.com/wiki/display/MPM/How+To+Get+Stanford+Memex+S3+Data) for information about configuring your S3 access.
+
+
+# Writing Queries
 TSV files and CSV files are the bread-and-butter of data science.
 [Pandas](http://pandas.pydata.org/) and [blaze](http://blaze.pydata.org/) are the bread-and-butter of data science in
-Python, and can be used to get things into TSVs and CSVs. As such, queries (or bulk versions of queries) should try to
-either write files or return data frames.
+Python, and can be used to get things into TSVs and CSVs. As such, queries (or bulk versions of queries) should be written with the expectation that they either:
+* Take data in bulk and&hellip;
+  * return a `pandas.DataFrame`, `pandas.Series`, or appropriate `blaze` object.
+  * write the results to a CSV or TSV and confirm that it has been written (or failed to be written)
+* Take a single row of data and&hellip;
+  * return a `pandas.DataFrame`, `pandas.Series`, or appropriate `blaze` object.
+  * return a single row of data.
 
-In general, we're relying on data stored in the MEMEX cluster or in a local [sqlite](https://www.sqlite.org/org) 
-database. I want fast results, and keeping everything in flat files has resulted in some very slow reads. Better 
-workarounds would be welcome, but for now I'd prefer to dump stuff to pandas after pulling out rows of interest.
 
-*That said*, as currently written the code tends to lean on pandas for calculation. SQL is used for pulling subset
-of ad data, and pandas is for more sophisticated work. This is perhaps not the most efficient way of doing things,
-but it hopefully makes SQL easier to swap out than pandas.
+## I don't like SQL and want to stay clear of it.
+The easiest way to do this is create a `DataFrame` by selecting all of the rows in the table:
+  ```
+  > import pandas as pd
+  > from sqlalchemy import create_engine
+  > sqlite_connection = create_engine('s3:///{}'.format(path_to_sqlite_db))
+  > df = pd.DataFrame.read_sql('select * from some_table', sqlite_connection)
+  ```
 
+This is *not* a terrible practice, though using pandas to ingest a particularly large table may be. Since all of the teams are performing their own extractions, the design goal here should be to lean towards Python and away from specific types of databases. If this gets you the data in the format you want, great.
 
 # Glossary of terms
+Since we're jumping across a few different databases and munging together identical objects with different identifiers, I use a particular vernacular for clarity
 
 Term | Meaning
 :--- |:---
 CDR Ad ID | The `_id` of an advertisement in the CDR.
 CDR Image ID | The `_id` of an image in the CDR. Each image has an ad as its parent
 General CDR Image ID | A notional `_id`; the set of all CDR Image IDs for images that have identical hashes. (That is, that are actually the same image.
-DD ID | The ID of an advertisement in the most recent dump of the Deep Dive Data, a.k.a Lattice Data, a.ka. Stanford Data. (Available at s3://memex-data/escort_cdr_2; see [here](https://memexproxy.com/wiki/display/MPM/How+To+Get+Stanford+Memex+S3+Data) for information about access.)
-
+DD ID | The ID of an advertisement in the most recent dump of the Deep Dive Data, a.k.a Lattice Data, a.ka. Stanford Data.
