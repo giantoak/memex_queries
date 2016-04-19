@@ -1,12 +1,13 @@
+import datetime as dt
 from HelperFuncs import post_dates_for_general_cdr_image_id
 from HelperFuncs import cdr_ad_ids_for_general_cdr_image_id
 from HelperFuncs import dd_df_from_sqlite_tables
-from HelperFuncs import dd_id
+from HelperFuncs import dd_id_from_cdr_id
 
 
-def query_one(image_id, es=None):
+def query_one(cdr_image_id, es=None):
     """
-    For a given image image_id, return the first date (in the CDR) that it appeared)
+    For a given image cdr_image_id, return the first date (in the CDR) that it appeared)
     Currently: Get the image from the CDR
     Hit Svebor's table to get the image hash.
     If that doesn't work, hit the image binary and get the SHA1 yourself.
@@ -14,109 +15,120 @@ def query_one(image_id, es=None):
     give up.
     Hit Svebor's table for a list of timestamps.
     If that doesn't work, hit elastic
-    :todo: Use Lattice's extracted post data, not Svebor's table.
-    :todo: Make default more efficient by hitting elastic with all ads at once
-    :param str image_id: The CDR ID of the image to retrieve
+    :param str cdr_image_id: The CDR ID of the image to retrieve
     :param elasticsearch.Elasticsearch es: the elasticsearch index to search
+    :return datetime.datetime:
     """
-    return min(post_dates_for_general_cdr_image_id(image_id, es))
+    return min(post_dates_for_general_cdr_image_id(cdr_image_id, es))
 
 
-def query_two(image_id):
+def query_two(cdr_image_id):
     """
-    For a given image_id, what phone number (or numbers) posted ads using image_id
+    For a given cdr_image_id, what phone number (or numbers) posted ads using image_id
     on the first date (in the CDR) that it appeared?
-    :param str image_id: The CDR ID of the image to retrieve
-    :return:
+    :param str cdr_image_id: The CDR ID of the image to retrieve
+    :return set:
     """
-    dd_ad_ids = [dd_id(x) for x in cdr_ad_ids_for_general_cdr_image_id(image_id)]
+    dd_ad_ids = [dd_id_from_cdr_id(x) for x in cdr_ad_ids_for_general_cdr_image_id(cdr_image_id)]
     df = dd_df_from_sqlite_tables(dd_ad_ids, ['dd_id_to_phone', 'dd_id_to_post_date'])
     first_date = df.post_date.min()
 
     return set(df.ix[(df.post_date == first_date), 'phone'].values)
 
 
-def query_three(image_id, timestamp):
+def query_three(cdr_image_id, post_date):
     """
-    For a given image_id at timestamp
-    WHAT phone numbers posted ads with image_id at an earlier date?
-    :param str image_id: The CDR ID of the image to retrieve
-    :param timestamp:
-    :return:
+    For a given cdr_image_id at post_date
+    WHAT phone numbers posted ads with cdr_image_id at an earlier date?
+    :param str cdr_image_id: The CDR ID of the image to retrieve
+    :param str|datetime.datetime post_date: Date against which to check
+    :return set:
     """
-    dd_ad_ids = [dd_id(x) for x in cdr_ad_ids_for_general_cdr_image_id(image_id)]
+    dd_ad_ids = [dd_id_from_cdr_id(x) for x in cdr_ad_ids_for_general_cdr_image_id(cdr_image_id)]
     df = dd_df_from_sqlite_tables(dd_ad_ids, ['dd_id_to_phone', 'dd_id_to_post_date'])
-    return set(df.ix[df.post_date < timestamp, 'phone'])
+
+    if isinstance(post_date, str):
+        post_date = dt.datetime(str)
+
+    return set(df.ix[df.post_date < post_date, 'phone'])
 
 
-def query_four(image_id, timestamp):
+def query_four(cdr_image_id, post_date):
     """
-    For a given image_id ~~posted by phone_number~~ at timestamp,
+    For a given cdr_image_id ~~posted by phone_number~~ at post_date,
     HOW MANY phone numbers posted ads with I at an earlier date?
-    :param str image_id: The CDR ID of the image to retrieve
-
-    :return:
+    :param str cdr_image_id: The CDR ID of the image to retrieve
+    :param str|datetime.datetime post_date: Date against which to check
+    :return int:
     """
-    return len(query_three(image_id, timestamp))
+    return len(query_three(cdr_image_id, post_date))
 
 
-def query_five(image_id):
+def query_five(cdr_image_id):
     """
-    For a given image_id, what phone numbers posted ads using it?
-    :param str image_id: The CDR ID of the image to retrieve
-    :return:
+    For a given cdr_image_id, what phone numbers posted ads using it?
+    :param str cdr_image_id: The CDR ID of the image to retrieve
+    :return set:
     """
-    dd_ad_ids = [dd_id(x) for x in cdr_ad_ids_for_general_cdr_image_id(image_id)]
+    dd_ad_ids = [dd_id_from_cdr_id(x) for x in cdr_ad_ids_for_general_cdr_image_id(cdr_image_id)]
     return set(dd_df_from_sqlite_tables(dd_ad_ids, ['dd_id_to_phone']).phone)
 
 
-def query_six(image_id):
+def query_six(cdr_image_id):
     """
-    For a given image_id, how many phone numbers posted ads using it?
-    :param str image_id: The CDR ID of the image to retrieve
-    :return:
+    For a given cdr_image_id, how many phone numbers posted ads using it?
+    :param str cdr_image_id: The CDR ID of the image to retrieve
+    :return int:
     """
-    return len(query_five(image_id))
+    return len(query_five(cdr_image_id))
 
 
-def query_seven(image_id, phone_number, timestamp):
+def query_seven(cdr_image_id, phone_number, post_date):
     """
-    For a given image_id posted by phone_number at timestamp
+    For a given cdr_image_id posted by phone_number on post_date
     what phone numbers OTHER THAN PHONE_NUMBER posted ads with image_id at an earlier date?
-    :param str image_id: The CDR ID of the image to retrieve
+    :param str cdr_image_id: The CDR ID of the image to retrieve
     :param str phone_number:
+    :param str|datetime.datetime post_date: Date against which to check
     :return:
     """
-    dd_ad_ids = [dd_id(x) for x in cdr_ad_ids_for_general_cdr_image_id(image_id)]
+    dd_ad_ids = [dd_id_from_cdr_id(x) for x in cdr_ad_ids_for_general_cdr_image_id(cdr_image_id)]
     df = dd_df_from_sqlite_tables(dd_ad_ids, ['dd_id_to_phone', 'dd_id_to_post_date'])
-    return set(df.ix[(df.phone != phone_number) & df.timestamp < timestamp, 'phone'].values)
+
+    if isinstance(post_date, str):
+        post_date = dt.datetime(post_date)
+
+    return set(df.ix[(df.phone != phone_number) & df.post_date < post_date, 'phone'].values)
 
 
-def query_eight(image_id, phone_number, timestamp):
+def query_eight(image_id, phone_number, post_date):
     """
-    For a given image_id posted by phone_number at timestamp,
+    For a given image_id posted by phone_number at post_date,
     HOW MANY phone numbers other than P posted ads with I at an earlier date?
     :param str image_id: The CDR ID of the image to retrieve
-    :return:
+    :param str phone_number:
+    :param str|datetime.datetime post_date: Date against which to check
+    :return int:
     """
-    return len(query_seven(image_id, phone_number, timestamp))
+    return len(query_seven(image_id, phone_number, post_date))
 
 
-def query_nine(ad_id, phone_number=None):
+def query_nine(cdr_ad_id, phone_number=None):
     """
-    For a given ad_id posted by phone_number
+    For a given cdr_ad_id posted by phone_number
     what fraction of the images were first used in ads posted by by phone numbers other than P?
-    :param str ad_id: The CDR ID of an ad
+    :param str cdr_ad_id: The CDR ID of an ad
     :param str phone_number:
     :return:
     """
+    dd_ad_id = dd_id_from_cdr_id(cdr_ad_id)
 
 
-def query_ten(ad_id):
+def query_ten(cdr_ad_id):
     """
     For all of the images affiliated with a given ad_id,
     if you find which phone number originated each ad, how many total sources does the ad have?
-    :param str ad_id: The CDR ID of an ad
+    :param str cdr_ad_id: The CDR ID of an ad
     :return:
     """
 
@@ -150,10 +162,10 @@ def query_eleven(image_id, epochtime=None, es=None):
     return 0
 
 
-def query_twelve(image_id):
+def query_twelve(cdr_image_id):
     """
     For a given image_id, what is its radius of gyration?
-    :param str image_id: The CDR ID of the image to retrieve
+    :param str cdr_image_id: The CDR ID of the image to retrieve
     :return:
     """
 
@@ -165,62 +177,62 @@ def query_thirteen():
     """
 
 
-def query_fourteen(ad_id):
+def query_fourteen(cdr_ad_id):
     """
-    For a given ad_id posted at time T,
+    For a given cdr_ad_id posted at time T,
     what fraction of the images have not been used in prior ads?
-    :param str ad_id: The CDR ID of an ad
+    :param str cdr_ad_id: The CDR ID of an ad
     :return:
     """
 
 
-def query_fifteen(ad_id):
+def query_fifteen(cdr_ad_id):
     """
-    For a given ad_id posted at time T, what is the mean number of times images in the ad have appeared before?
-    :param str ad_id: The CDR ID of an ad
+    For a given cdr_ad_id posted at time T, what is the mean number of times images in the ad have appeared before?
+    :param str cdr_ad_id: The CDR ID of an ad
     :return:
     """
 
 
-def query_sixteen(ad_id):
+def query_sixteen(cdr_ad_id):
     """
-    For a given ad_id, what is the mean amount time since ads in the photos first appeared?
-    :param str ad_id: The CDR ID of an ad
+    For a given cdr_ad_id, what is the mean amount time since ads in the photos first appeared?
+    :param str cdr_ad_id: The CDR ID of an ad
     :return:
     """
 
 
-def query_seventeen(image_id):
+def query_seventeen(cdr_image_id):
     """
     For a given image_id, what is the median price in all ads using this photo?
-    :param str image_id: The CDR ID of the image to retrieve
+    :param str cdr_image_id: The CDR ID of the image to retrieve
     :return:
     """
 
 
-def query_eighteen(image_id):
+def query_eighteen(cdr_image_id):
     """
     For a given image_id, what proportion of ads including that image offer outcall services?
-    :param str image_id: The CDR ID of the image to retrieve
+    :param str cdr_image_id: The CDR ID of the image to retrieve
     :return:
     """
 
 
-def query_nineteen(image_id):
+def query_nineteen(cdr_image_id):
     """
     For a given image_id,
     what is the Lat-long of the centroid defined by the locations provided for the advertisements
     in which I has been used?
-    :param str image_id: The CDR ID of the image to retrieve
+    :param str cdr_image_id: The CDR ID of the image to retrieve
     :return:
     """
 
 
-def query_twenty(image_id):
+def query_twenty(cdr_image_id):
     """
     For a given image_id used in an ad at time T,
     what is the largest Photo Gap (query_eleven) that has been seen for any use of the I in prior ads?
-    :param str image_id: The CDR ID of the image to retrieve
+    :param str cdr_image_id: The CDR ID of the image to retrieve
     :return:
     """
 
@@ -233,38 +245,38 @@ def query_twenty_one():
     """
 
 
-def query_twenty_two(ad_id):
+def query_twenty_two(cdr_ad_id):
     """
     For a given ad_id
     with a set of images (I),
     what is the first date on which an ad using exactly (I) appeared?
-    :param str ad_id: The CDR ID of an ad
+    :param str cdr_ad_id: The CDR ID of an ad
     :return:
     """
 
 
-def query_twenty_three(ad_id):
+def query_twenty_three(cdr_ad_id):
     """
     For a given ad_id with a set of images (I),
     what is the first date on which an ad using (I) or a superset of (I) appeared?
-    :param str ad_id: The CDR ID of an ad
+    :param str cdr_ad_id: The CDR ID of an ad
     :return:
     """
 
 
-def query_twenty_four(ad_id):
+def query_twenty_four(cdr_ad_id):
     """
     For a given ad_id with a set of images (I) posted at time T,
     how many prior ads have used exactly (I)?
-    :param str ad_id: The CDR ID of an ad
+    :param str cdr_ad_id: The CDR ID of an ad
     :return:
     """
 
 
-def query_twenty_five(ad_id):
+def query_twenty_five(cdr_ad_id):
     """
     For a given ad_id with a set of images (I) posted at time T,
     how many prior ads have used (I) or a superset of (I)?
-    :param str ad_id: The CDR ID of an ad
+    :param str cdr_ad_id: The CDR ID of an ad
     :return:
     """

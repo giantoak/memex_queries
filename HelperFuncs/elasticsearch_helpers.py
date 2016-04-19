@@ -36,3 +36,54 @@ def new_elasticsearch():
         local_es = Elasticsearch(es_url)
 
     return local_es
+
+
+def cdr_ad_ids_for_cdr_image_ids(cdr_image_ids, es=None):
+    """
+
+    :param list|str cdr_image_ids:
+    :param elasticsearch.Elasticsearhc es:
+    :return list:
+    """
+    if es is None:
+        es = new_elasticsearch()
+
+    data_dict = es.search(body=must_bool_filter_query({'_id': cdr_image_ids}),
+                          filter_path=['hits.hits'],
+                          fields=['obj_parent'])
+    return [x['fields']['object_parent'] for x in data_dict['hits']['hits']]
+
+
+def cdr_image_ids_for_cdr_ad_ids(cdr_ad_ids, es=None):
+    """
+
+    :param list|str cdr_ad_ids:
+    :param elsasticsearch.Elasticsearch es:
+    :return list:
+    """
+
+    if es is None:
+        es = new_elasticsearch()
+
+    q = must_bool_filter_query({'obj_parent': cdr_ad_ids})
+    data_dict = es.search(body=q, filter_path=['hits.hits._id'])
+    return [x['_id'] for x in data_dict['hits']['hits']]
+
+
+def stored_url_of_cdr_image_id(cdr_image_id, es=None):
+    """
+
+    :param cdr_image_id:
+    :param es:
+    :return:
+    """
+    if es is None:
+        es = new_elasticsearch()
+
+    q = must_bool_filter_query({'_id': cdr_image_id})
+
+    try:
+        data_dict = es.search(body=q, filter_path=['hits.hits._source'])
+        return data_dict['hits']['hits'][0]['_source']['obj_stored_url']
+    except:
+        return None

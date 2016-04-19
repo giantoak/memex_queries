@@ -1,6 +1,7 @@
-from .elasticsearch_helpers import new_elasticsearch
-from .elasticsearch_helpers import must_bool_filter_query
-from .hbase_helpers import dd_id
+from .elasticsearch_helpers import stored_url_of_cdr_image_id
+from .elasticsearch_helpers import cdr_ad_ids_for_cdr_image_ids
+from .hbase_helpers import cdr_id_from_dd_id
+from .hbase_helpers import dd_id_from_cdr_id
 from .hbase_helpers import dd_id_df
 from .hbase_helpers import hbase_row_value
 from .sqlite_helpers import dd_df_from_sqlite_tables
@@ -26,13 +27,7 @@ def cdr_ad_ids_for_general_cdr_image_id(cdr_image_id, es=None):
         return ad_ids.split(',')
 
     # Our fallback is to hit elastic and get every parent of the current image
-    if es is None:
-        es = new_elasticsearch()
-
-    data_dict = es.search(body=must_bool_filter_query({'_id': cdr_image_id}),
-                          filter_path=['hits.hits'],
-                          fields=['obj_parent'])
-    return [x['fields']['object_parent'] for x in data_dict['hits']['hits']]
+    return cdr_ad_ids_for_cdr_image_ids(cdr_image_id, es)
 
 
 def image_stored_url(cdr_image_id, es=None):
@@ -53,18 +48,7 @@ def image_stored_url(cdr_image_id, es=None):
     except:
         pass
 
-    try:
-        # Get the url from elastic
-        if es is None:
-             es = new_elasticsearch()
-        q = must_bool_filter_query({'_id': cdr_image_id})
-        data_dict = es.search(body=q, filter_path=['hits.hits._source'])
-        image_url = data_dict['hits']['hits'][0]['_source']['obj_stored_url']
-        return image_url
-    except:
-        pass
-
-    return None
+    return stored_url_of_cdr_image_id(cdr_image_id, es)
 
 
 def image_hash(cdr_image_id, es=None):
@@ -103,7 +87,7 @@ def post_dates_for_cdr_ad_ids(cdr_ad_ids):
     :param list|set cdr_ad_ids: An iterable of CDR Ad IDs
     :return pandas.DataFrame: DataFrame of CDR IDs, DD IDs, and Post Dates
     """
-    return dd_id_df(cdr_ad_ids).join(dd_df_from_sqlite_tables([dd_id(x) for x in cdr_ad_ids],
+    return dd_id_df(cdr_ad_ids).join(dd_df_from_sqlite_tables([dd_id_from_cdr_id(x) for x in cdr_ad_ids],
                                                               'dd_id_to_post_date'),
                                      on=['dd_id'])
 
