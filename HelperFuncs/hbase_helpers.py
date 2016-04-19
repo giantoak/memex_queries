@@ -29,6 +29,13 @@ def dd_id_from_cdr_id(cdr_id):
     return int(hbase_row_value('cdr_id_to_dd_id', cdr_id, 'info:dd_id'))
 
 
+def cdr_id_from_dd_id(dd_id):
+    """
+    Query HBase to get the CDR Ad ID that maps this particular Lattice / Deep Dive ID.
+    :param int dd_id: The DD ID of a scraped escort ad.
+    :return str:
+    """
+    return hbase_row_value('deepdive_escort_ads', dd_id, 'info:cdr_id')
 
 def dd_id_df(cdr_ids):
     """
