@@ -49,10 +49,10 @@ The easiest way to do this is create a `DataFrame` by selecting all of the rows 
   > df = pd.DataFrame.read_sql('select * from some_table', sqlite_connection)
   ```
 
-This is *not* a terrible practice, though using pandas to ingest a particularly large table may be. Since all of the teams are performing their own extractions, the design goal here should be to lean towards Python and away from specific types of databases. If this gets you the data in the format you want, great.
+This isn't a terrible practice! (Using pandas to ingest a particularly large table probably is.) Since all of the teams are performing their own extractions, the design goal here should be to lean towards Python and away from specific types of databases. If this gets you the data in the format you want: great.
 
 # Glossary of terms
-Since we're jumping across a few different databases and munging together identical objects with different identifiers, I use a particular vernacular for clarity
+Since we're jumping across a few different databases and munging together identical objects with different identifiers,the module uses a particular vernacular for clarity:
 
 Term | Meaning
 :--- |:---
