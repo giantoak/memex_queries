@@ -1,8 +1,8 @@
 import datetime as dt
-from HelperFuncs import post_dates_for_general_cdr_image_id
-from HelperFuncs import cdr_ad_ids_for_general_cdr_image_id
-from HelperFuncs import dd_df_from_sqlite_tables
-from HelperFuncs import dd_id_from_cdr_id
+from helpers import post_dates_for_general_cdr_image_id
+from helpers import cdr_ad_ids_for_general_cdr_image_id
+from helpers.sqlite import dd_df_from_sqlite_tables
+from helpers.hbase import dd_id_from_cdr_id
 
 
 def query_one(cdr_image_id, es=None):

@@ -1,3 +1,4 @@
 .pyc
 .idea
-memex_queries/HelperFuncs/dd_dump.db
+memex_queries/helpers/dd_dump.db
+memex_queries/helpers/__pycache__

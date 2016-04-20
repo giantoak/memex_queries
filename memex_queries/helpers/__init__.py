@@ -1,10 +1,11 @@
-from .elasticsearch_helpers import stored_url_of_cdr_image_id
-from .elasticsearch_helpers import cdr_ad_ids_for_cdr_image_ids
-from .hbase_helpers import cdr_id_from_dd_id
-from .hbase_helpers import dd_id_from_cdr_id
-from .hbase_helpers import dd_id_df
-from .hbase_helpers import hbase_row_value
-from .sqlite_helpers import dd_df_from_sqlite_tables
+from .cdr import stored_url_of_cdr_image_id
+from .cdr import cdr_ad_ids_for_cdr_image_ids
+from .cdr import cdr_image_ids_for_cdr_ad_ids
+from .hbase import cdr_id_from_dd_id
+from .hbase import dd_id_from_cdr_id
+from .hbase import dd_id_df
+from .hbase import hbase_row_value
+from .sqlite import dd_df_from_sqlite_tables
 
 
 def cdr_ad_ids_for_general_cdr_image_id(cdr_image_id, es=None):
@@ -104,7 +105,12 @@ def post_dates_for_general_cdr_image_id(cdr_image_id, es=None):
 
 def cdr_image_ids_for_dd_ad_id(dd_ad_id):
     """
-
     :param int dd_ad_id:
     :return:
     """
+
+    # The HBase table isn't yet fully populated, so we use sqlite
+    # cdr_ad_id = hbase_row_value('deepdive_escort_ads', dd_ad_id, 'info:cdr_id')
+    cdr_ad_id = dd_df_from_sqlite_tables([dd_ad_id], ['dd_id_to_cdr_id']).iloc[0, 1]
+
+    return cdr_image_ids_for_cdr_ad_ids(cdr_ad_id)

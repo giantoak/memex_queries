@@ -11,15 +11,32 @@ Top-level queries to run against the data: these should be used for answering qu
 > new_pd_dataframe = pd_dataframe.apply(memex_query_two)
 ```
 
-### [`memex_queries/HelperFuncs`](https://github.com/giantoak/memex_queries/tree/master/memex_queries/HelperFuncs)
+### [`memex_queries/helpers`](https://github.com/giantoak/memex_queries/tree/master/memex_queries/helpers)
 Lower-level helper functions that can be used as components of high-level queries. These should facilitate hitting particular MEMEX resources ([Elasticsearch,](https://www.elastic.co/products/elasticsearch) [HBase,](https://hbase.apache.org/) and perhaps eventually [Hive](https://hive.apache.org/) and [Impala](http://impala.io/)). DeepDive data is currently stored locally, within a [SQLite](https://www.sqlite.org) database.
 ```
-> # Sample high-level query using low-level components:
+> # Sample high-level query using low-level components: 
 > def memex_query_three(image_cdr_id):
+>   from helpers.elasticsearch import get_data_from_cdr
+>   from helpers.hbase import det_data_from_hbase
+>
 >   related_ads = get_data_from_cdr(image_cdr_id)
 >   data_related_to_ads = get_data_from_hbase('some_table', related_ads)
 >   return list(data_related_to_ads)
 ```
+
+Helper functions are broken down across four files:
+
+#### [`memex_queries/helpers/__init__.py`](https://github.com/giantoak/memex_queries/blob/master/memex_queries/helpers/__init__.py)
+Functions that interact with mulitple data stores.
+
+#### [`memex_queries/helpers/cdr.py`](https://github.com/giantoak/memex_queries/blob/master/memex_queries/helpers/cdr.py)
+Functions for interacting with the CDR
+
+#### [`memex_queries/helpers/hbase.py`](https://github.com/giantoak/memex_queries/blob/master/memex_queries/helpers/hbase.py)
+Functions for interacting with HBase
+
+### [`memex_queries/helpers/sqlite.py`](https://github.com/giantoak/memex_queries/blob/master/memex_queries/helpers/sqlite.py)
+Functions for interacting with SQLite
 
 ## Setup stuff
 ### [`make_dd_sqlite_db.sql`](https://github.com/giantoak/memex_queries/blob/master/make_dd_sqlite_db.sql)
