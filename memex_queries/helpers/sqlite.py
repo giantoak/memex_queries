@@ -11,25 +11,9 @@ def new_sqlite_con():
 
     global local_sqlite
     if local_sqlite is None:
-        local_sqlite = create_engine('s3:///{}'.format(SQLITE_FILE))
+        local_sqlite = create_engine('sqlite:///{}'.format(SQLITE_FILE))
 
     return local_sqlite
-
-
-def get_phones_for_dd_ids(dd_ids, sql_con=None):
-    """
-
-    :param list|set dd_ids:
-    :return pandas.DataFrame:
-    """
-    from pandas import read_sql
-
-    if sql_con is None:
-        sql_con = new_sqlite_con()
-
-    query = 'select * from dd_id_to_phone where dd_id in ({})'.format(','.join(str(x) for x in dd_ids))
-
-    return read_sql(query, sql_con)
 
 
 def dd_df_from_sqlite_tables(dd_ids, sqlite_tables, sql_con=None):
@@ -58,3 +42,12 @@ def dd_df_from_sqlite_tables(dd_ids, sqlite_tables, sql_con=None):
         df['post_date'] = df.post_date.apply(to_datetime)
 
     return df
+
+
+def get_phones_for_dd_ids(dd_ids, sql_con=None):
+    """
+
+    :param list|set dd_ids:
+    :return pandas.DataFrame:
+    """
+    return dd_df_from_sqlite_tables(dd_ids, ['dd_id_to_phone'], sql_con)
