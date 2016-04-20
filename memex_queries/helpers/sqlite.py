@@ -51,6 +51,10 @@ def dd_df_from_sqlite_tables(dd_ids, sqlite_tables, sql_con=None):
 
     for s_t in sqlite_tables[1:]:
         df_2 = read_sql(query_fmt(s_t, dd_ids_str), sql_con)
-        df = df.merge(df_2, on=['dd_id'])
+        df = df.merge(df_2, on=['dd_id'], how='outer')
+
+    if 'post_date' in df:
+        from pandas import to_datetime
+        df['post_date'] = df.post_date.apply(to_datetime)
 
     return df
