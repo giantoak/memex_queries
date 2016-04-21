@@ -1,10 +1,13 @@
-ES_URL = 'els.istresearch.com:19200/memex-domains'
-ES_INDEX = 'escorts'
-ES_AUTH_TUPLE = ('memex', 'qRJfu2uPkMLmH9cp')
-es_url = 'https://{}:{}@{}/{}/'.format(ES_AUTH_TUPLE[0],
-                                       ES_AUTH_TUPLE[1],
-                                       ES_URL,
-                                       ES_INDEX)
+es_url_format = 'https://{}:{}@{}/{}/'.format
+
+CDR_URL = 'els.istresearch.com:19200/memex-domains'
+CDR_INDEX = 'escorts'
+CDR_AUTH_TUPLE = ('memex', 'qRJfu2uPkMLmH9cp')
+
+cdr_url = es_url_format(CDR_AUTH_TUPLE[0],
+                        CDR_AUTH_TUPLE[1],
+                        CDR_URL,
+                        CDR_INDEX)
 local_es = None
 
 
@@ -25,7 +28,7 @@ def must_bool_filter_query(query_dict):
     }
 
 
-def new_elasticsearch():
+def _new_elasticsearch():
     """
 
     :return elasticsearch.Elasticsearch:
@@ -38,52 +41,74 @@ def new_elasticsearch():
     return local_es
 
 
+def cdr_fields_for_cdr_ids(cdr_ids, fields=None, es=None):
+    """
+    Given a list of cdr_ids, returns a dict of ids with all of the requested fields.
+    Per elasicsearch, if an entry lacks a field it is omitted.
+    :param list|sr cdr_ids:
+    :param list|str fields:
+    :param elasticsearch.Elasticsearch es:
+    :return dict:
+    """
+
+    if es is None:
+        es = _new_elasticsearch()
+
+    if fields is None:
+        data_dict = es.search(body=must_bool_filter_query({'_id': cdr_ids}),
+                              filter_path=['hits.hits'],
+                              size=len(cdr_ids))
+    else:
+        data_dict = es.search(body=must_bool_filter_query({'_id': cdr_ids}),
+                              filter_path=['hits.hits'],
+                              fields=fields,
+                              size=len(cdr_ids))
+
+    out_dict = dict()
+    for x in data_dict['hits']['hits']:
+        out_dict[x] = dict()
+        for y in x['fields']:
+            if isinstance(x['fields'][y], list) and len(x['fields'][y]) == 1:
+                out_dict[x][y] = x['fields'][y][0]
+            else:
+                out_dict[x][y] = x['fields'][y]
+
+    return out_dict
+
+
 def cdr_ad_ids_for_cdr_image_ids(cdr_image_ids, es=None):
     """
 
     :param list|str cdr_image_ids:
-    :param elasticsearch.Elasticsearhc es:
+    :param elasticsearch.Elasticsearch es:
     :return list:
     """
-    if es is None:
-        es = new_elasticsearch()
-
-    data_dict = es.search(body=must_bool_filter_query({'_id': cdr_image_ids}),
-                          filter_path=['hits.hits'],
-                          fields=['obj_parent'])
-    return [x['fields']['object_parent'] for x in data_dict['hits']['hits']]
+    data_dict = cdr_fields_for_cdr_ids(cdr_image_ids, 'obj_parent', es)
+    return [data_dict[x]['obj_parent'] for x in cdr_image_ids]
 
 
 def cdr_image_ids_for_cdr_ad_ids(cdr_ad_ids, es=None):
     """
-
+    Given a list of cdr_ad_ids or one cdr_ad_id, find the cdr_image_ids used with those ads.
     :param list|str cdr_ad_ids:
     :param elsasticsearch.Elasticsearch es:
-    :return list:
+    :return set:
     """
-
     if es is None:
-        es = new_elasticsearch()
+        es = _new_elasticsearch()
 
     q = must_bool_filter_query({'obj_parent': cdr_ad_ids})
     data_dict = es.search(body=q, filter_path=['hits.hits._id'])
-    return [x['_id'] for x in data_dict['hits']['hits']]
+    return set(x['_id'] for x in data_dict['hits']['hits'])
 
 
 def stored_url_of_cdr_image_id(cdr_image_id, es=None):
     """
-
-    :param cdr_image_id:
-    :param es:
+    Given a cdr_image_id, return the URL where it has been stored
+    :param str cdr_image_id:
+    :param elasticsearch.Elasticsearch es:
     :return:
     """
-    if es is None:
-        es = new_elasticsearch()
+    data_dict = cdr_fields_for_cdr_ids(cdr_image_id, 'obj_stored_url', es)
+    return data_dict[cdr_image_id]['obj_stored_url']
 
-    q = must_bool_filter_query({'_id': cdr_image_id})
-
-    try:
-        data_dict = es.search(body=q, filter_path=['hits.hits._source'])
-        return data_dict['hits']['hits'][0]['_source']['obj_stored_url']
-    except:
-        return None
