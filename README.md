@@ -20,7 +20,7 @@ Top-level queries to run against the data for info about images: these should be
 > # Sample use:
 > new_pd_series = pd_series.apply(memex_query_one)
 > new_pd_dataframe = pd_dataframe.apply(memex_query_two)
-
+```
 
 ### [`memex_queries/helpers`](https://github.com/giantoak/memex_queries/tree/master/memex_queries/helpers)
 Lower-level helper functions that can be used as components of high-level queries. These should facilitate hitting particular MEMEX resources. DeepDive data is currently stored locally, within a [SQLite](https://www.sqlite.org) database.
