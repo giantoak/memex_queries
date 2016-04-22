@@ -11,19 +11,16 @@ cdr_url = es_url_format(CDR_AUTH_TUPLE[0],
 local_es = None
 
 
-def must_bool_filter_query(query_dict):
+def filter_terms_query(query_dict):
     """
     Takes a dict of parameters and returns a matching boolean filter
     :param dict query_dict:
     :return dict:
     """
+
     return {
         "filter": {
-            "bool": {
-                "must": {
-                    "term": query_dict
-                }
-            }
+            "terms": query_dict
         }
     }
 
@@ -36,10 +33,9 @@ def _new_elasticsearch():
     from elasticsearch import Elasticsearch
     global local_es
     if local_es is None:
-        local_es = Elasticsearch(es_url)
+        local_es = Elasticsearch(cdr_url)
 
     return local_es
-
 
 def cdr_fields_for_cdr_ids(cdr_ids, fields=None, es=None):
     """
@@ -55,12 +51,12 @@ def cdr_fields_for_cdr_ids(cdr_ids, fields=None, es=None):
         es = _new_elasticsearch()
 
     if fields is None:
-        data_dict = es.search(body=must_bool_filter_query({'_id': cdr_ids}),
-                              filter_path=['hits.hits'],
+        data_dict = es.search(body=filter_terms_query({'_id': cdr_ids}),
+                              filter_path='hits.hits',
                               size=len(cdr_ids))
     else:
-        data_dict = es.search(body=must_bool_filter_query({'_id': cdr_ids}),
-                              filter_path=['hits.hits'],
+        data_dict = es.search(body=filter_terms_query({'_id': cdr_ids}),
+                              filter_path='hits.hits',
                               fields=fields,
                               size=len(cdr_ids))
 
@@ -107,8 +103,7 @@ def stored_url_of_cdr_image_id(cdr_image_id, es=None):
     Given a cdr_image_id, return the URL where it has been stored
     :param str cdr_image_id:
     :param elasticsearch.Elasticsearch es:
-    :return:
+    :return str:
     """
     data_dict = cdr_fields_for_cdr_ids(cdr_image_id, 'obj_stored_url', es)
     return data_dict[cdr_image_id]['obj_stored_url']
-
