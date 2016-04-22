@@ -2,7 +2,7 @@
 
 This repository contains a Python module for calculating stats against a wide variety of MEMEX escort data. It exists because the MEMEX data is scattered across multiple resources and knowledge sharing remains hard. `memex_queries` strives to make querying the data easy, abstracting away as many of the different data stores as possible.
 
-In practice, this means that hits to various MEMEX [HBase](https://hbase.apache.org/) tables, the [Elasticsearch](https://www.elastic.co/products/elasticsearch) CDR, and [Hive](https://hive.apache.org/) and [Impala](http://impala.io/) tables are hidden away in lower-level queries. These queries can be used to compose high-level queries. To keep things friendly for as many users as possible, resources available on the MEMEX Cluster should be preferred to those that are local. 
+In practice, this means that hits to various MEMEX [HBase](https://hbase.apache.org/) tables, the [Elasticsearch](https://www.elastic.co/products/elasticsearch) CDR, and [Hive](https://hive.apache.org/) and [Impala](http://impala.io/) tables are hidden away in lower-level queries. These queries can be used to compose high-level queries. To keep things friendly for as many users as possible, resources available on the MEMEX Cluster should be preferred to those that are local.
 
 The module is organized as follows:
 
@@ -12,17 +12,20 @@ Folder of generated Sphinx docs. You can't get to them in your browser, but if y
 
 ## Python stuff
 ### [`memex_queries/__init__.py`](https://github.com/giantoak/memex_queries/blob/master/memex_queries/__init__.py)
-Top-level queries to run against the data: these should be used for answering questions related to specific fields or collections of fields:
+A currently-empty `__init__.py` to make this a module. Families of queries should live in their own sibling `.py` files.
+
+### [`memex_queries/go_images.py`](https://github.com/giantoak/memex_queries/blob/master/memex_queries/go_images.py)
+Top-level queries to run against the data for info about images: these should be used for answering questions related to specific fields or collections of fields:
 ```
 > # Sample use:
 > new_pd_series = pd_series.apply(memex_query_one)
 > new_pd_dataframe = pd_dataframe.apply(memex_query_two)
-```
+
 
 ### [`memex_queries/helpers`](https://github.com/giantoak/memex_queries/tree/master/memex_queries/helpers)
 Lower-level helper functions that can be used as components of high-level queries. These should facilitate hitting particular MEMEX resources. DeepDive data is currently stored locally, within a [SQLite](https://www.sqlite.org) database.
 ```
-> # Sample high-level query using low-level components: 
+> # Sample high-level query using low-level components:
 > def memex_query_three(image_cdr_id):
 >   from helpers.elasticsearch import get_data_from_cdr
 >   from helpers.hbase import det_data_from_hbase
@@ -35,7 +38,7 @@ Lower-level helper functions that can be used as components of high-level querie
 Helper functions are broken down across four files:
 
 #### [`memex_queries/helpers/__init__.py`](https://github.com/giantoak/memex_queries/blob/master/memex_queries/helpers/__init__.py)
-Functions that interact with mulitple data stores. We try to prioritise the local SQLite DB first, then HBase, then the CDR / Elasticsearch. 
+Functions that interact with mulitple data stores. We try to prioritise the local SQLite DB first, then HBase, then the CDR / Elasticsearch.
 
 #### [`memex_queries/helpers/cdr.py`](https://github.com/giantoak/memex_queries/blob/master/memex_queries/helpers/cdr.py)
 Functions for interacting with the CDR

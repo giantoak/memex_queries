@@ -8,11 +8,26 @@ Subpackages
 
     memex_queries.helpers
 
+Submodules
+----------
+
+memex_queries.go_images module
+------------------------------
+
+.. automodule:: memex_queries.go_images
+    :members:
+    :special-members:
+    :private-members:
+    :undoc-members:
+    :show-inheritance:
+
+
 Module contents
 ---------------
 
 .. automodule:: memex_queries
     :members:
+    :special-members:
     :private-members:
     :undoc-members:
     :show-inheritance:
