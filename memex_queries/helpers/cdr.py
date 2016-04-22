@@ -61,13 +61,13 @@ def cdr_fields_for_cdr_ids(cdr_ids, fields=None, es=None):
                               size=len(cdr_ids))
 
     out_dict = dict()
-    for x in data_dict['hits']['hits']:
-        out_dict[x] = dict()
-        for y in x['fields']:
-            if isinstance(x['fields'][y], list) and len(x['fields'][y]) == 1:
-                out_dict[x][y] = x['fields'][y][0]
+    for hit in data_dict['hits']['hits']:
+        out_dict[hit['_id']] = dict()
+        for x in hit['fields']:
+            if isinstance(hit['fields'][x], list) and len(hit['fields'][x]) == 1:
+                out_dict[hit['_id']][x] = hit['fields'][x][0]
             else:
-                out_dict[x][y] = x['fields'][y]
+                out_dict[hit['_id']][x] = hit['fields'][x]
 
     return out_dict
 
