@@ -1,0 +1,495 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>memex_queries &mdash; memex_queries  documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="memex_queries  documentation" href="../index.html"/>
+        <link rel="up" title="Module code" href="index.html"/> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> memex_queries
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul>
+<li class="toctree-l1"><a class="reference internal" href="../memex_queries.html">memex_queries package</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../index.html">memex_queries</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="index.html">Module code</a> &raquo;</li>
+      
+    <li>memex_queries</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for memex_queries</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">datetime</span> <span class="kn">as</span> <span class="nn">dt</span>
+<span class="kn">from</span> <span class="nn">helpers</span> <span class="kn">import</span> <span class="n">post_dates_for_general_cdr_image_id</span>
+<span class="kn">from</span> <span class="nn">helpers</span> <span class="kn">import</span> <span class="n">cdr_ad_ids_for_general_cdr_image_id</span>
+<span class="kn">from</span> <span class="nn">helpers.sqlite</span> <span class="kn">import</span> <span class="n">dd_df_from_sqlite_tables</span>
+<span class="kn">from</span> <span class="nn">helpers.hbase</span> <span class="kn">import</span> <span class="n">dd_id_from_cdr_id</span>
+
+
+<div class="viewcode-block" id="query_one"><a class="viewcode-back" href="../memex_queries.html#memex_queries.query_one">[docs]</a><span class="k">def</span> <span class="nf">query_one</span><span class="p">(</span><span class="n">cdr_image_id</span><span class="p">,</span> <span class="n">es</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    For a given `cdr_image_id`, return the first date that it was posted in \</span>
+<span class="sd">    an ad.</span>
+
+<span class="sd">    :param str cdr_image_id: The CDR ID of the image to retrieve</span>
+<span class="sd">    :param elasticsearch.Elasticsearch es: the elasticsearch index to search</span>
+<span class="sd">    :returns: `datetime.datetime` --</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="nb">min</span><span class="p">(</span><span class="n">post_dates_for_general_cdr_image_id</span><span class="p">(</span><span class="n">cdr_image_id</span><span class="p">,</span> <span class="n">es</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="query_two"><a class="viewcode-back" href="../memex_queries.html#memex_queries.query_two">[docs]</a><span class="k">def</span> <span class="nf">query_two</span><span class="p">(</span><span class="n">cdr_image_id</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    For a given `cdr_image_id`, what phone number (or numbers) posted ads \</span>
+<span class="sd">    using `cdr_image_id` on the first date (in the CDR) that it appeared?</span>
+
+<span class="sd">    :param str cdr_image_id: The CDR ID of the image to retrieve</span>
+<span class="sd">    :returns: `set` --</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">dd_ad_ids</span> <span class="o">=</span> <span class="p">[</span><span class="n">dd_id_from_cdr_id</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">cdr_ad_ids_for_general_cdr_image_id</span><span class="p">(</span><span class="n">cdr_image_id</span><span class="p">)]</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">dd_df_from_sqlite_tables</span><span class="p">(</span><span class="n">dd_ad_ids</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;dd_id_to_phone&#39;</span><span class="p">,</span> <span class="s1">&#39;dd_id_to_post_date&#39;</span><span class="p">])</span>
+    <span class="n">first_date</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">post_date</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="nb">set</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">ix</span><span class="p">[(</span><span class="n">df</span><span class="o">.</span><span class="n">post_date</span> <span class="o">==</span> <span class="n">first_date</span><span class="p">),</span> <span class="s1">&#39;phone&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="query_three"><a class="viewcode-back" href="../memex_queries.html#memex_queries.query_three">[docs]</a><span class="k">def</span> <span class="nf">query_three</span><span class="p">(</span><span class="n">cdr_image_id</span><span class="p">,</span> <span class="n">post_date</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    For a given `cdr_image_id` at `post_date`, **what** phone numbers posted \</span>
+<span class="sd">    ads with `cdr_image_id` at an earlier date?</span>
+
+<span class="sd">    :param str cdr_image_id: The CDR ID of the image to retrieve</span>
+<span class="sd">    :param str|datetime.datetime post_date: Date against which to check</span>
+<span class="sd">    :returns: `set` --</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">dd_ad_ids</span> <span class="o">=</span> <span class="p">[</span><span class="n">dd_id_from_cdr_id</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">cdr_ad_ids_for_general_cdr_image_id</span><span class="p">(</span><span class="n">cdr_image_id</span><span class="p">)]</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">dd_df_from_sqlite_tables</span><span class="p">(</span><span class="n">dd_ad_ids</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;dd_id_to_phone&#39;</span><span class="p">,</span> <span class="s1">&#39;dd_id_to_post_date&#39;</span><span class="p">])</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">post_date</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">post_date</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="nb">set</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">post_date</span> <span class="o">&lt;</span> <span class="n">post_date</span><span class="p">,</span> <span class="s1">&#39;phone&#39;</span><span class="p">])</span></div>
+
+
+<div class="viewcode-block" id="query_four"><a class="viewcode-back" href="../memex_queries.html#memex_queries.query_four">[docs]</a><span class="k">def</span> <span class="nf">query_four</span><span class="p">(</span><span class="n">cdr_image_id</span><span class="p">,</span> <span class="n">post_date</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    For a given `cdr_image_id` at `post_date`,</span>
+<span class="sd">    HOW MANY phone numbers posted ads with I at an earlier date?</span>
+
+<span class="sd">    :param str cdr_image_id: The CDR ID of the image to retrieve</span>
+<span class="sd">    :param str|datetime.datetime post_date: Date against which to check</span>
+<span class="sd">    :returns: `int` --</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">query_three</span><span class="p">(</span><span class="n">cdr_image_id</span><span class="p">,</span> <span class="n">post_date</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="query_five"><a class="viewcode-back" href="../memex_queries.html#memex_queries.query_five">[docs]</a><span class="k">def</span> <span class="nf">query_five</span><span class="p">(</span><span class="n">cdr_image_id</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    For a given cdr_image_id, what phone numbers posted ads using it?</span>
+
+<span class="sd">    :param str cdr_image_id: The CDR ID of the image to retrieve</span>
+<span class="sd">    :returns: `set` --</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">dd_ad_ids</span> <span class="o">=</span> <span class="p">[</span><span class="n">dd_id_from_cdr_id</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">cdr_ad_ids_for_general_cdr_image_id</span><span class="p">(</span><span class="n">cdr_image_id</span><span class="p">)]</span>
+    <span class="k">return</span> <span class="nb">set</span><span class="p">(</span><span class="n">dd_df_from_sqlite_tables</span><span class="p">(</span><span class="n">dd_ad_ids</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;dd_id_to_phone&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">phone</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="query_six"><a class="viewcode-back" href="../memex_queries.html#memex_queries.query_six">[docs]</a><span class="k">def</span> <span class="nf">query_six</span><span class="p">(</span><span class="n">cdr_image_id</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    For a given cdr_image_id, how many phone numbers posted ads using it?</span>
+
+<span class="sd">    :param str cdr_image_id: The CDR ID of the image to retrieve</span>
+<span class="sd">    :returns: `int` --</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">query_five</span><span class="p">(</span><span class="n">cdr_image_id</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="query_seven"><a class="viewcode-back" href="../memex_queries.html#memex_queries.query_seven">[docs]</a><span class="k">def</span> <span class="nf">query_seven</span><span class="p">(</span><span class="n">cdr_image_id</span><span class="p">,</span> <span class="n">phone_number</span><span class="p">,</span> <span class="n">post_date</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    For a given `cdr_image_id` posted by `phone_number` on `post_date`</span>
+<span class="sd">    what phone numbers **other than `phone_number`** posted ads with \</span>
+<span class="sd">    `cdr_image_id` at an earlier date?</span>
+
+<span class="sd">    :param str cdr_image_id: The CDR ID of the image to retrieve</span>
+<span class="sd">    :param str phone_number:</span>
+<span class="sd">    :param str|datetime.datetime post_date: Date against which to check</span>
+<span class="sd">    :return:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">dd_ad_ids</span> <span class="o">=</span> <span class="p">[</span><span class="n">dd_id_from_cdr_id</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">cdr_ad_ids_for_general_cdr_image_id</span><span class="p">(</span><span class="n">cdr_image_id</span><span class="p">)]</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">dd_df_from_sqlite_tables</span><span class="p">(</span><span class="n">dd_ad_ids</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;dd_id_to_phone&#39;</span><span class="p">,</span> <span class="s1">&#39;dd_id_to_post_date&#39;</span><span class="p">])</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">post_date</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">post_date</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="n">post_date</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="nb">set</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">ix</span><span class="p">[(</span><span class="n">df</span><span class="o">.</span><span class="n">phone</span> <span class="o">!=</span> <span class="n">phone_number</span><span class="p">)</span> <span class="o">&amp;</span> <span class="n">df</span><span class="o">.</span><span class="n">post_date</span> <span class="o">&lt;</span> <span class="n">post_date</span><span class="p">,</span> <span class="s1">&#39;phone&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="query_eight"><a class="viewcode-back" href="../memex_queries.html#memex_queries.query_eight">[docs]</a><span class="k">def</span> <span class="nf">query_eight</span><span class="p">(</span><span class="n">cdr_image_id</span><span class="p">,</span> <span class="n">phone_number</span><span class="p">,</span> <span class="n">post_date</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    For a given `cdr_image_id` posted by `phone_number` at `post_date`, \</span>
+<span class="sd">    **how many** phone numbers other than `phone_number`-posted ads with \</span>
+<span class="sd">    `cdr_image_id` at an earlier date?</span>
+
+<span class="sd">    :param str cdr_image_id: The CDR ID of the image to retrieve</span>
+<span class="sd">    :param str phone_number:</span>
+<span class="sd">    :param str|datetime.datetime post_date: Date against which to check</span>
+<span class="sd">    :returns: `int` --</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">query_seven</span><span class="p">(</span><span class="n">cdr_image_id</span><span class="p">,</span> <span class="n">phone_number</span><span class="p">,</span> <span class="n">post_date</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="query_nine"><a class="viewcode-back" href="../memex_queries.html#memex_queries.query_nine">[docs]</a><span class="k">def</span> <span class="nf">query_nine</span><span class="p">(</span><span class="n">cdr_ad_id</span><span class="p">,</span> <span class="n">phone_number</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    For a given `cdr_ad_id` posted by `phone_number` what fraction of the \</span>
+<span class="sd">    images were first used in ads posted by by phone numbers other than P?</span>
+
+<span class="sd">    :param str cdr_ad_id: The CDR ID of an ad</span>
+<span class="sd">    :param str phone_number:</span>
+<span class="sd">    :returns: --</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">dd_ad_id</span> <span class="o">=</span> <span class="n">dd_id_from_cdr_id</span><span class="p">(</span><span class="n">cdr_ad_id</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="query_ten"><a class="viewcode-back" href="../memex_queries.html#memex_queries.query_ten">[docs]</a><span class="k">def</span> <span class="nf">query_ten</span><span class="p">(</span><span class="n">cdr_ad_id</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    For all of the images affiliated with a given `cdr_ad_id`, if you find which \</span>
+<span class="sd">    phone number originated each ad, how many total sources does the ad have?</span>
+
+<span class="sd">    :param str cdr_ad_id: The CDR ID of an ad</span>
+<span class="sd">    :returns: --</span>
+<span class="sd">    &quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="query_eleven"><a class="viewcode-back" href="../memex_queries.html#memex_queries.query_eleven">[docs]</a><span class="k">def</span> <span class="nf">query_eleven</span><span class="p">(</span><span class="n">cdr_image_id</span><span class="p">,</span> <span class="n">epochtime</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">es</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    For a given `cdr_image_id` posted at `epochtime`, how long has it been since \</span>
+<span class="sd">    the image was last posted?</span>
+
+<span class="sd">    :param str cdr_image_id: The CDR ID of the image to retrieve</span>
+<span class="sd">    :param int epochtime: if None, assume we&#39;re talking about the gap between \</span>
+<span class="sd">    the most and second-most recent instance. If an int, find the first \</span>
+<span class="sd">    timestamp BEFORE the one provided.</span>
+<span class="sd">    :param elasticsearch.Elasticsearch es:</span>
+<span class="sd">    :returns: `int` -- epochtime since the last posting</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">ad_timestamps</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">post_dates_for_general_cdr_image_id</span><span class="p">(</span><span class="n">cdr_image_id</span><span class="p">,</span> <span class="n">es</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="n">epochtime</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="c1"># If there&#39;s been no postings, the gap is infinite</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ad_timestamps</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">None</span>
+
+        <span class="c1"># If there&#39;s been one posting, the gap is 0</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ad_timestamps</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mi">0</span>
+
+        <span class="k">return</span> <span class="n">ad_timestamps</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">ad_timestamps</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+
+    <span class="k">for</span> <span class="n">ts</span> <span class="ow">in</span> <span class="n">ad_timestamps</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="n">ts</span> <span class="o">&lt;</span> <span class="n">epochtime</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">epochtime</span> <span class="o">-</span> <span class="n">ts</span>
+
+    <span class="k">return</span> <span class="mi">0</span></div>
+
+
+<div class="viewcode-block" id="query_twelve"><a class="viewcode-back" href="../memex_queries.html#memex_queries.query_twelve">[docs]</a><span class="k">def</span> <span class="nf">query_twelve</span><span class="p">(</span><span class="n">cdr_image_id</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    For a given `cdr_image_id`, what is its radius of gyration?</span>
+
+<span class="sd">    :param str cdr_image_id: The CDR ID of the image to retrieve</span>
+<span class="sd">    :returns:  --</span>
+<span class="sd">    &quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="query_thirteen"><a class="viewcode-back" href="../memex_queries.html#memex_queries.query_thirteen">[docs]</a><span class="k">def</span> <span class="nf">query_thirteen</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Estimate \gamma for arrival rate under Poisson or some other similar thing</span>
+
+<span class="sd">    :returns:  --</span>
+<span class="sd">    &quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="query_fourteen"><a class="viewcode-back" href="../memex_queries.html#memex_queries.query_fourteen">[docs]</a><span class="k">def</span> <span class="nf">query_fourteen</span><span class="p">(</span><span class="n">cdr_ad_id</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    For a given cdr_ad_id posted at time T,</span>
+<span class="sd">    what fraction of the images have not been used in prior ads?</span>
+
+<span class="sd">    :param str cdr_ad_id: The CDR ID of an ad</span>
+<span class="sd">    :returns:  --</span>
+<span class="sd">    &quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="query_fifteen"><a class="viewcode-back" href="../memex_queries.html#memex_queries.query_fifteen">[docs]</a><span class="k">def</span> <span class="nf">query_fifteen</span><span class="p">(</span><span class="n">cdr_ad_id</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    For a given `cdr_ad_id` posted at time T, what is the mean number of</span>
+<span class="sd">    times images in the ad have appeared before?</span>
+
+<span class="sd">    :param str cdr_ad_id: The CDR ID of an ad</span>
+<span class="sd">    :returns:  --</span>
+<span class="sd">    &quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="query_sixteen"><a class="viewcode-back" href="../memex_queries.html#memex_queries.query_sixteen">[docs]</a><span class="k">def</span> <span class="nf">query_sixteen</span><span class="p">(</span><span class="n">cdr_ad_id</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    For a given `cdr_ad_id`, what is the mean amount time since ads in the \</span>
+<span class="sd">    photos first appeared?</span>
+
+<span class="sd">    :param str cdr_ad_id: The CDR ID of an ad</span>
+<span class="sd">    :returns:  --</span>
+<span class="sd">    &quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="query_seventeen"><a class="viewcode-back" href="../memex_queries.html#memex_queries.query_seventeen">[docs]</a><span class="k">def</span> <span class="nf">query_seventeen</span><span class="p">(</span><span class="n">cdr_image_id</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    For a given `cdr_image_id`, what is the median price in all ads using \</span>
+<span class="sd">    this photo?</span>
+
+<span class="sd">    :param str cdr_image_id: The CDR ID of the image to retrieve</span>
+<span class="sd">    :returns:  --</span>
+<span class="sd">    &quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="query_eighteen"><a class="viewcode-back" href="../memex_queries.html#memex_queries.query_eighteen">[docs]</a><span class="k">def</span> <span class="nf">query_eighteen</span><span class="p">(</span><span class="n">cdr_image_id</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    For a given `cdr_image_id`, what proportion of ads including that image offer \</span>
+<span class="sd">    outcall services?</span>
+
+<span class="sd">    :param str cdr_image_id: The CDR ID of the image to retrieve</span>
+<span class="sd">    :returns:  --</span>
+<span class="sd">    &quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="query_nineteen"><a class="viewcode-back" href="../memex_queries.html#memex_queries.query_nineteen">[docs]</a><span class="k">def</span> <span class="nf">query_nineteen</span><span class="p">(</span><span class="n">cdr_image_id</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    For a given `cdr_image_id`, what is the Lat-long of the centroid defined by \</span>
+<span class="sd">    the locations provided for the advertisements in which I has been used?</span>
+
+<span class="sd">    :param str cdr_image_id: The CDR ID of the image to retrieve</span>
+<span class="sd">    :returns:  --</span>
+<span class="sd">    &quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="query_twenty"><a class="viewcode-back" href="../memex_queries.html#memex_queries.query_twenty">[docs]</a><span class="k">def</span> <span class="nf">query_twenty</span><span class="p">(</span><span class="n">cdr_image_id</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    For a given `cdr_image_id` used in an ad at time T, what is the largest \</span>
+<span class="sd">    Photo Gap (query_eleven) that has been seen for any use of the I in \</span>
+<span class="sd">    prior ads?</span>
+
+<span class="sd">    :param str cdr_image_id: The CDR ID of the image to retrieve</span>
+<span class="sd">    :returns:  --</span>
+<span class="sd">    &quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="query_twenty_one"><a class="viewcode-back" href="../memex_queries.html#memex_queries.query_twenty_one">[docs]</a><span class="k">def</span> <span class="nf">query_twenty_one</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    query_seven and query_seventeen are general attempts at finding time \</span>
+<span class="sd">    period clusters for images.</span>
+
+<span class="sd">    A specific time-based cluster of images would be useful.</span>
+<span class="sd">    :returns:  --</span>
+<span class="sd">    &quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="query_twenty_two"><a class="viewcode-back" href="../memex_queries.html#memex_queries.query_twenty_two">[docs]</a><span class="k">def</span> <span class="nf">query_twenty_two</span><span class="p">(</span><span class="n">cdr_ad_id</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    For a given `ad_id` with a set of images (I), what is the first date on \</span>
+<span class="sd">    which an ad using exactly (I) appeared?</span>
+
+<span class="sd">    :param str cdr_ad_id: The CDR ID of an ad</span>
+<span class="sd">    :returns:  --</span>
+<span class="sd">    &quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="query_twenty_three"><a class="viewcode-back" href="../memex_queries.html#memex_queries.query_twenty_three">[docs]</a><span class="k">def</span> <span class="nf">query_twenty_three</span><span class="p">(</span><span class="n">cdr_ad_id</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    For a given `ad_id` with a set of images (I), what is the first date on \</span>
+<span class="sd">    which an ad using (I) or a superset of (I) appeared?</span>
+
+<span class="sd">    :param str cdr_ad_id: The CDR ID of an ad</span>
+<span class="sd">    :returns:  --</span>
+<span class="sd">    &quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="query_twenty_four"><a class="viewcode-back" href="../memex_queries.html#memex_queries.query_twenty_four">[docs]</a><span class="k">def</span> <span class="nf">query_twenty_four</span><span class="p">(</span><span class="n">cdr_ad_id</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    For a given `cdr_ad_id` with a set of images (I) posted at time T, how \</span>
+<span class="sd">    many prior ads have used exactly (I)?</span>
+
+<span class="sd">    :param str cdr_ad_id: The CDR ID of an ad</span>
+<span class="sd">    :returns:  --</span>
+<span class="sd">    &quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="query_twenty_five"><a class="viewcode-back" href="../memex_queries.html#memex_queries.query_twenty_five">[docs]</a><span class="k">def</span> <span class="nf">query_twenty_five</span><span class="p">(</span><span class="n">cdr_ad_id</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    For a given `cdr_ad_id` with a set of images (I) posted at time T, how \</span>
+<span class="sd">    many prior ads have used (I) or a superset of (I)?</span>
+
+<span class="sd">    :param str cdr_ad_id: The CDR ID of an ad</span>
+<span class="sd">    :returns:  --</span>
+<span class="sd">    &quot;&quot;&quot;</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016, Author.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

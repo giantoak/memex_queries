@@ -4,8 +4,7 @@ local_sqlite = None
 
 def new_sqlite_con():
     """
-
-    :return sqlalchemy.create_engine:
+    :returns: `sqlalchemy.create_engine` -- Connection to the SQLite database.
     """
     from sqlalchemy import create_engine
 
@@ -18,10 +17,12 @@ def new_sqlite_con():
 
 def dd_df_from_sqlite_tables(dd_ids, sqlite_tables, sql_con=None):
     """
-
-    :param dd_ids:
-    :param sqlite_tables:
-    :return pandas.DataFrame:
+    :param list dd_ids: list of Deep Dive IDs to retrieve
+    :param list sqlite_tables: list of SQLite tables to join
+    :param sqlalchemy.create_engine sql_con: Connection to SQLite (can be \
+    omitted)
+    :returns: `pandas.DataFrame` -- dataframe of tables, joined using the Deep \
+    Dive IDs.
     """
     from pandas import read_sql
 
@@ -46,8 +47,10 @@ def dd_df_from_sqlite_tables(dd_ids, sqlite_tables, sql_con=None):
 
 def get_phones_for_dd_ids(dd_ids, sql_con=None):
     """
-
-    :param list|set dd_ids:
-    :return pandas.DataFrame:
+    :param list dd_ids: List of Deep Dive IDs
+    :param sqlalchemy.create_engine sql_con: Connection to SQLite (can be \
+    omitted)
+    :returns: `pandas.DataFrame` -- Data Frame of Deep Dive IDs and the phone \
+    numbers assigned to them.
     """
     return dd_df_from_sqlite_tables(dd_ids, ['dd_id_to_phone'], sql_con)

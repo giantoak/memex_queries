@@ -1,0 +1,333 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>memex_queries.helpers &mdash; memex_queries  documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="memex_queries  documentation" href="../../index.html"/>
+        <link rel="up" title="memex_queries" href="../memex_queries.html"/> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> memex_queries
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../memex_queries.html">memex_queries package</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../index.html">memex_queries</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+      
+          <li><a href="../memex_queries.html">memex_queries</a> &raquo;</li>
+      
+    <li>memex_queries.helpers</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for memex_queries.helpers</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">.cdr</span> <span class="kn">import</span> <span class="n">stored_url_of_cdr_image_id</span>
+<span class="kn">from</span> <span class="nn">.cdr</span> <span class="kn">import</span> <span class="n">cdr_ad_ids_for_cdr_image_ids</span>
+<span class="kn">from</span> <span class="nn">.cdr</span> <span class="kn">import</span> <span class="n">cdr_fields_for_cdr_ids</span>
+<span class="kn">from</span> <span class="nn">.cdr</span> <span class="kn">import</span> <span class="n">cdr_image_ids_for_cdr_ad_ids</span>
+<span class="kn">from</span> <span class="nn">.hbase</span> <span class="kn">import</span> <span class="n">cdr_id_from_dd_id</span>
+<span class="kn">from</span> <span class="nn">.hbase</span> <span class="kn">import</span> <span class="n">dd_id_from_cdr_id</span>
+<span class="kn">from</span> <span class="nn">.hbase</span> <span class="kn">import</span> <span class="n">dd_id_df</span>
+<span class="kn">from</span> <span class="nn">.hbase</span> <span class="kn">import</span> <span class="n">hbase_row_value</span>
+<span class="kn">from</span> <span class="nn">.sqlite</span> <span class="kn">import</span> <span class="n">dd_df_from_sqlite_tables</span>
+
+
+<div class="viewcode-block" id="cdr_ad_ids_for_general_cdr_image_id"><a class="viewcode-back" href="../../memex_queries.helpers.html#memex_queries.helpers.cdr_ad_ids_for_general_cdr_image_id">[docs]</a><span class="k">def</span> <span class="nf">cdr_ad_ids_for_general_cdr_image_id</span><span class="p">(</span><span class="n">cdr_image_id</span><span class="p">,</span> <span class="n">es</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    :param str cdr_image_id: The CDR ID of an image</span>
+<span class="sd">    :param elasticsearch.Elasticsearch es: CDR Connection (can be omitted)</span>
+<span class="sd">    :returns: `list` -- A list of the CDR Ad IDs in which the image was used.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">cur_hash</span> <span class="o">=</span> <span class="n">image_hash</span><span class="p">(</span><span class="n">cdr_image_id</span><span class="p">,</span> <span class="n">es</span><span class="p">)</span>
+
+    <span class="c1"># TODO: Hit Gabriel&#39;s table of hashes instead of Svebor&#39;s table or ES.</span>
+
+    <span class="c1"># Check Svebor&#39;s table for a copy of the hashed image</span>
+    <span class="c1"># and the ads in which it was used</span>
+    <span class="n">ad_ids</span> <span class="o">=</span> <span class="n">hbase_row_value</span><span class="p">(</span><span class="s1">&#39;ht_images_infos_2016&#39;</span><span class="p">,</span>
+                             <span class="n">cur_hash</span><span class="p">,</span>
+                             <span class="s1">&#39;info:all_parent_ids&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">ad_ids</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">ad_ids</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Our fallback is to hit elastic and get every parent of the *speicific&amp; current image</span>
+    <span class="k">return</span> <span class="n">cdr_ad_ids_for_cdr_image_ids</span><span class="p">(</span><span class="n">cdr_image_id</span><span class="p">,</span> <span class="n">es</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="image_stored_url"><a class="viewcode-back" href="../../memex_queries.helpers.html#memex_queries.helpers.image_stored_url">[docs]</a><span class="k">def</span> <span class="nf">image_stored_url</span><span class="p">(</span><span class="n">cdr_image_id</span><span class="p">,</span> <span class="n">es</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    :param str cdr_image_id: A CDR Image ID</span>
+<span class="sd">    :param elasticsearch.Elasticsearch es: CDR Connection (can be omitted)</span>
+<span class="sd">    :returns: `str` -- The image&#39;s stored URL, or `None`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">image_json</span> <span class="o">=</span> <span class="n">hbase_row_value</span><span class="p">(</span><span class="s1">&#39;dig_isi_cdr2_ht_images&#39;</span><span class="p">,</span>
+                                     <span class="n">cdr_image_id</span><span class="p">,</span>
+                                     <span class="s1">&#39;images:images&#39;</span><span class="p">)</span>
+        <span class="n">image_url</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span><span class="n">image_json</span><span class="p">)[</span><span class="s1">&#39;obj_stored_url&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">image_url</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">image_url</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="k">pass</span>
+
+    <span class="k">return</span> <span class="n">stored_url_of_cdr_image_id</span><span class="p">(</span><span class="n">cdr_image_id</span><span class="p">,</span> <span class="n">es</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="image_hashes"><a class="viewcode-back" href="../../memex_queries.helpers.html#memex_queries.helpers.image_hashes">[docs]</a><span class="k">def</span> <span class="nf">image_hashes</span><span class="p">(</span><span class="n">cdr_image_ids</span><span class="p">,</span> <span class="n">es</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    * Check various MEMEX resources for the SHA1 hashes of `cdr_image_ids`</span>
+<span class="sd">    * If they can&#39;t be found, calculate the hashes</span>
+<span class="sd">    * Returns an ordered list of the results.</span>
+
+<span class="sd">    :param list cdr_image_ids: A list of CDR Image IDs</span>
+<span class="sd">    :param elasticsearch.Elasticsearch es: CDR Connection (can be omitted)</span>
+<span class="sd">    :returns: `list(str)` -- A list of hashes of `cdr_image_ids`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">requests</span>
+
+    <span class="c1"># this is a stupid workaround; should use a list</span>
+    <span class="n">hash_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+
+    <span class="c1"># Check Svebor&#39;s hash lookup table</span>
+    <span class="c1"># Return if we find everything</span>
+    <span class="k">for</span> <span class="n">cdr_image_id</span> <span class="ow">in</span> <span class="n">cdr_image_ids</span><span class="p">:</span>
+        <span class="n">hash_dict</span><span class="p">[</span><span class="n">cdr_image_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">hbase_row_value</span><span class="p">(</span><span class="s1">&#39;ht_images_cdrid_to_sha1_2016&#39;</span><span class="p">,</span>
+                                                  <span class="n">cdr_image_id</span><span class="p">,</span>
+                                                  <span class="s1">&#39;hash:sha1&#39;</span><span class="p">)</span>
+
+    <span class="n">missing_image_cdr_ids</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">hash_dict</span> <span class="k">if</span> <span class="n">hash_dict</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">]</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">missing_image_cdr_ids</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">hash_dict</span><span class="p">[</span><span class="n">cdr_image_id</span><span class="p">]</span> <span class="k">for</span> <span class="n">cdr_image_id</span> <span class="ow">in</span> <span class="n">cdr_image_ids</span><span class="p">]</span>
+
+    <span class="c1"># Hit the CDR for original URLs and lookup ids for image_hash</span>
+    <span class="n">data_dict</span> <span class="o">=</span> <span class="n">cdr_fields_for_cdr_ids</span><span class="p">(</span><span class="n">missing_image_cdr_ids</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;crawl_data.image_id&#39;</span><span class="p">,</span> <span class="s1">&#39;obj_stored_url&#39;</span><span class="p">],</span> <span class="n">es</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">cdr_image_id</span> <span class="ow">in</span> <span class="n">data_dict</span><span class="p">:</span>
+        <span class="k">if</span> <span class="s1">&#39;crawl_data.image_id&#39;</span> <span class="ow">in</span> <span class="n">data_dict</span><span class="p">[</span><span class="n">cdr_image_id</span><span class="p">]:</span>
+            <span class="n">hash_dict</span><span class="p">[</span><span class="n">cdr_image_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">hbase_row_value</span><span class="p">(</span><span class="s1">&#39;image_hash&#39;</span><span class="p">,</span>
+                                                      <span class="n">data_dict</span><span class="p">[</span><span class="s1">&#39;crawl_data.image_id&#39;</span><span class="p">],</span>
+                                                      <span class="s1">&#39;image:hash&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">hash_dict</span><span class="p">[</span><span class="n">cdr_image_id</span><span class="p">]</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">data_dict</span><span class="p">[</span><span class="s1">&#39;obj_stored_url&#39;</span><span class="p">])</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">text</span>
+
+            <span class="kn">from</span> <span class="nn">hashlib</span> <span class="kn">import</span> <span class="n">sha1</span>
+            <span class="n">h</span> <span class="o">=</span> <span class="n">sha1</span><span class="p">()</span>
+            <span class="n">h</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf8&#39;</span><span class="p">))</span>
+            <span class="n">hash_dict</span><span class="p">[</span><span class="n">cdr_image_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="p">[</span><span class="n">hash_dict</span><span class="p">[</span><span class="n">cdr_image_id</span><span class="p">]</span> <span class="k">for</span> <span class="n">cdr_image_id</span> <span class="ow">in</span> <span class="n">cdr_image_ids</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="image_hash"><a class="viewcode-back" href="../../memex_queries.helpers.html#memex_queries.helpers.image_hash">[docs]</a><span class="k">def</span> <span class="nf">image_hash</span><span class="p">(</span><span class="n">cdr_image_id</span><span class="p">,</span> <span class="n">es</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Invokes `image_hashes` on a single `cdr_image_id`</span>
+
+<span class="sd">    :param str cdr_image_id: A CDR Image ID</span>
+<span class="sd">    :param elasticsearch.Elasticsearch es: CDR Connection (can be omitted)</span>
+<span class="sd">    :returns: `str` -- SHA1 hash of `cdr_image_id`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">image_hashes</span><span class="p">([</span><span class="n">cdr_image_id</span><span class="p">],</span> <span class="n">es</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="post_dates_for_cdr_ad_ids"><a class="viewcode-back" href="../../memex_queries.helpers.html#memex_queries.helpers.post_dates_for_cdr_ad_ids">[docs]</a><span class="k">def</span> <span class="nf">post_dates_for_cdr_ad_ids</span><span class="p">(</span><span class="n">cdr_ad_ids</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Given a list of CDR Ad IDs, find their DD IDs and when they were posted.</span>
+
+<span class="sd">    :param list cdr_ad_ids: A list of CDR IDs of escort ads.</span>
+<span class="sd">    :returns: `pandas.DataFrame` -- DataFrame of CDR IDs, DD IDs, and Post Dates</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">dd_id_df</span><span class="p">(</span><span class="n">cdr_ad_ids</span><span class="p">)</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dd_df_from_sqlite_tables</span><span class="p">([</span><span class="n">dd_id_from_cdr_id</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">cdr_ad_ids</span><span class="p">],</span>
+                                                              <span class="s1">&#39;dd_id_to_post_date&#39;</span><span class="p">),</span>
+                                     <span class="n">on</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;dd_id&#39;</span><span class="p">])</span></div>
+
+
+<div class="viewcode-block" id="post_dates_for_general_cdr_image_id"><a class="viewcode-back" href="../../memex_queries.helpers.html#memex_queries.helpers.post_dates_for_general_cdr_image_id">[docs]</a><span class="k">def</span> <span class="nf">post_dates_for_general_cdr_image_id</span><span class="p">(</span><span class="n">cdr_image_id</span><span class="p">,</span> <span class="n">es</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Given the ID of an image in the CDR, get all of the dates on which it \</span>
+<span class="sd">    was posted.</span>
+
+<span class="sd">    :param str cdr_image_id: An image&#39;s CDR ID</span>
+<span class="sd">    :param elasticsearch.Elasticsearch es: CDR Connection (can be omitted)</span>
+<span class="sd">    :returns: `pandas.DataFrame` -- DataFrame of CDR IDs, Deep Dive IDs, and \</span>
+<span class="sd">    Post Dates</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">post_dates_for_cdr_ad_ids</span><span class="p">(</span><span class="n">cdr_ad_ids_for_general_cdr_image_id</span><span class="p">(</span><span class="n">cdr_image_id</span><span class="p">,</span> <span class="n">es</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="cdr_image_ids_for_dd_ad_id"><a class="viewcode-back" href="../../memex_queries.helpers.html#memex_queries.helpers.cdr_image_ids_for_dd_ad_id">[docs]</a><span class="k">def</span> <span class="nf">cdr_image_ids_for_dd_ad_id</span><span class="p">(</span><span class="n">dd_ad_id</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    :param int dd_ad_id: The Deep Dive ID of an escort ad.</span>
+<span class="sd">    :returns: `list` -- The list of CDR IDs of the images used with this ad.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># The HBase table isn&#39;t yet fully populated, so we use sqlite</span>
+    <span class="c1"># cdr_ad_id = hbase_row_value(&#39;deepdive_escort_ads&#39;, dd_ad_id, &#39;info:cdr_id&#39;)</span>
+    <span class="n">cdr_ad_id</span> <span class="o">=</span> <span class="n">dd_df_from_sqlite_tables</span><span class="p">([</span><span class="n">dd_ad_id</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;dd_id_to_cdr_id&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="n">ad_image_dict</span> <span class="o">=</span> <span class="n">cdr_image_ids_for_cdr_ad_ids</span><span class="p">(</span><span class="n">cdr_ad_id</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">ad_image_dict</span><span class="p">[</span><span class="n">cdr_ad_id</span><span class="p">]</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016, Author.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
