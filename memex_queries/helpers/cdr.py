@@ -88,14 +88,23 @@ def cdr_image_ids_for_cdr_ad_ids(cdr_ad_ids, es=None):
     Given a list of cdr_ad_ids or one cdr_ad_id, find the cdr_image_ids used with those ads.
     :param list|str cdr_ad_ids:
     :param elsasticsearch.Elasticsearch es:
-    :return set:
+    :return dict:
     """
     if es is None:
         es = _new_elasticsearch()
 
-    q = must_bool_filter_query({'obj_parent': cdr_ad_ids})
-    data_dict = es.search(body=q, filter_path=['hits.hits._id'])
-    return set(x['_id'] for x in data_dict['hits']['hits'])
+    res_dict = {cdr_ad_id: [] for cdr_ad_id in cdr_ad_ids}
+
+    data_dict = es.search(body=filter_terms_query({'obj_parent': cdr_ad_ids}),
+                          filter_path=['hits.hits'],
+                          fields='obj_parent')
+    if len(data_dict) < 1:
+        return res_dict
+
+    for hit in data_dict['hits']['hits']:
+        res_dict[hit['fields']['obj_parent'][0]].append(hit['_id'])
+
+    return res_dict
 
 
 def stored_url_of_cdr_image_id(cdr_image_id, es=None):

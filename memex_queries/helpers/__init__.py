@@ -106,11 +106,11 @@ def post_dates_for_general_cdr_image_id(cdr_image_id, es=None):
 def cdr_image_ids_for_dd_ad_id(dd_ad_id):
     """
     :param int dd_ad_id:
-    :return:
+    :return list:
     """
 
     # The HBase table isn't yet fully populated, so we use sqlite
     # cdr_ad_id = hbase_row_value('deepdive_escort_ads', dd_ad_id, 'info:cdr_id')
     cdr_ad_id = dd_df_from_sqlite_tables([dd_ad_id], ['dd_id_to_cdr_id']).iloc[0, 1]
-
-    return cdr_image_ids_for_cdr_ad_ids(cdr_ad_id)
+    ad_image_dict = cdr_image_ids_for_cdr_ad_ids(cdr_ad_id)
+    return ad_image_dict[cdr_ad_id]
