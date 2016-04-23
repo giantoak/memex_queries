@@ -59,6 +59,8 @@ def cdr_fields_for_cdr_ids(cdr_ids, fields=None, es=None):
     out_dict = dict()
     for hit in data_dict['hits']['hits']:
         out_dict[hit['_id']] = dict()
+        if 'fields' not in hit:
+            continue
         for x in hit['fields']:
             if isinstance(hit['fields'][x], list) and len(hit['fields'][x]) == 1:
                 out_dict[hit['_id']][x] = hit['fields'][x][0]

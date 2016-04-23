@@ -81,10 +81,14 @@ def image_hashes(cdr_image_ids, es=None):
     for cdr_image_id in data_dict:
         if 'crawl_data.image_id' in data_dict[cdr_image_id]:
             hash_dict[cdr_image_id] = hbase_row_value('image_hash',
-                                                      data_dict['crawl_data.image_id'],
+                                                      data_dict[cdr_image_id]['crawl_data.image_id'],
                                                       'image:hash')
 
         if hash_dict[cdr_image_id] is None:
+            if 'obj_stored_url' not in data_dict:
+                # No stored URL, so nothing to be done
+                continue
+
             r = requests.get(data_dict['obj_stored_url'])
             data = r.text
 
