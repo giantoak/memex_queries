@@ -157,16 +157,18 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="kn">from</span> <span class="nn">pandas</span> <span class="kn">import</span> <span class="n">read_sql</span>
 
-    <span class="n">dd_ids_str</span> <span class="o">=</span> <span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">dd_ids</span><span class="p">)</span>
+    <span class="n">dd_ids_str</span> <span class="o">=</span> <span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s1">&#39;&quot;{}&quot;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">dd_ids</span><span class="p">])</span>
     <span class="n">query_fmt</span> <span class="o">=</span> <span class="s1">&#39;select * from {} where dd_id in ({})&#39;</span><span class="o">.</span><span class="n">format</span>
 
     <span class="k">if</span> <span class="n">sql_con</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
         <span class="n">sql_con</span> <span class="o">=</span> <span class="n">new_sqlite_con</span><span class="p">()</span>
 
     <span class="n">df</span> <span class="o">=</span> <span class="n">read_sql</span><span class="p">(</span><span class="n">query_fmt</span><span class="p">(</span><span class="n">sqlite_tables</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">dd_ids_str</span><span class="p">),</span> <span class="n">sql_con</span><span class="p">)</span>
+    <span class="n">df</span><span class="p">[</span><span class="s1">&#39;dd_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">dd_id</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
 
     <span class="k">for</span> <span class="n">s_t</span> <span class="ow">in</span> <span class="n">sqlite_tables</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
         <span class="n">df_2</span> <span class="o">=</span> <span class="n">read_sql</span><span class="p">(</span><span class="n">query_fmt</span><span class="p">(</span><span class="n">s_t</span><span class="p">,</span> <span class="n">dd_ids_str</span><span class="p">),</span> <span class="n">sql_con</span><span class="p">)</span>
+        <span class="n">df_2</span><span class="p">[</span><span class="s1">&#39;dd_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df_2</span><span class="o">.</span><span class="n">dd_id</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
         <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">df_2</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;dd_id&#39;</span><span class="p">],</span> <span class="n">how</span><span class="o">=</span><span class="s1">&#39;outer&#39;</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="s1">&#39;post_date&#39;</span> <span class="ow">in</span> <span class="n">df</span><span class="p">:</span>
@@ -174,6 +176,28 @@
         <span class="n">df</span><span class="p">[</span><span class="s1">&#39;post_date&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">post_date</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">to_datetime</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">df</span></div>
+
+
+<div class="viewcode-block" id="cdr_df_from_sqlite_tables"><a class="viewcode-back" href="../../../memex_queries.helpers.html#memex_queries.helpers.sqlite.cdr_df_from_sqlite_tables">[docs]</a><span class="k">def</span> <span class="nf">cdr_df_from_sqlite_tables</span><span class="p">(</span><span class="n">cdr_ad_ids</span><span class="p">,</span> <span class="n">sqlite_tables</span><span class="p">,</span> <span class="n">sql_con</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    :param list cdr_ad_ids: list of CDR Ad IDs to match with deep dive data</span>
+<span class="sd">    :param list sqlite_tables: list of SQLite tables to join</span>
+<span class="sd">    :param sqlalchemy.create_engine sql_con: Connection to SQLite (can be \</span>
+<span class="sd">    omitted)</span>
+<span class="sd">    :returns: `pandas.DataFrame` -- dataframe of tables, joined using the Deep \</span>
+<span class="sd">    Dive IDs.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">pandas</span> <span class="kn">import</span> <span class="n">read_sql</span>
+
+    <span class="n">cdr_ids_str</span> <span class="o">=</span> <span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s1">&#39;&quot;{}&quot;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cdr_id</span><span class="p">)</span> <span class="k">for</span> <span class="n">cdr_id</span> <span class="ow">in</span> <span class="n">cdr_ad_ids</span><span class="p">])</span>
+
+    <span class="k">if</span> <span class="n">sql_con</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">sql_con</span> <span class="o">=</span> <span class="n">new_sqlite_con</span><span class="p">()</span>
+
+    <span class="n">df</span> <span class="o">=</span> <span class="n">read_sql</span><span class="p">(</span><span class="s1">&#39;select * from dd_id_to_cdr_id where cdr_id in ({})&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cdr_ids_str</span><span class="p">),</span> <span class="n">sql_con</span><span class="p">)</span>
+    <span class="n">df_2</span> <span class="o">=</span> <span class="n">dd_df_from_sqlite_tables</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">dd_id</span><span class="p">),</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">sqlite_tables</span> <span class="k">if</span> <span class="n">x</span> <span class="o">!=</span> <span class="s1">&#39;dd_id_to_cdr_id&#39;</span><span class="p">],</span> <span class="n">sql_con</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">df</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">df_2</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;dd_id&#39;</span><span class="p">],</span> <span class="n">how</span><span class="o">=</span><span class="s1">&#39;outer&#39;</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="get_phones_for_dd_ids"><a class="viewcode-back" href="../../../memex_queries.helpers.html#memex_queries.helpers.sqlite.get_phones_for_dd_ids">[docs]</a><span class="k">def</span> <span class="nf">get_phones_for_dd_ids</span><span class="p">(</span><span class="n">dd_ids</span><span class="p">,</span> <span class="n">sql_con</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>

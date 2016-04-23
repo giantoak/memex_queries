@@ -135,6 +135,7 @@
 <span class="kn">from</span> <span class="nn">.hbase</span> <span class="kn">import</span> <span class="n">dd_id_from_cdr_id</span>
 <span class="kn">from</span> <span class="nn">.hbase</span> <span class="kn">import</span> <span class="n">dd_id_df</span>
 <span class="kn">from</span> <span class="nn">.hbase</span> <span class="kn">import</span> <span class="n">hbase_row_value</span>
+<span class="kn">from</span> <span class="nn">.sqlite</span> <span class="kn">import</span> <span class="n">cdr_df_from_sqlite_tables</span>
 <span class="kn">from</span> <span class="nn">.sqlite</span> <span class="kn">import</span> <span class="n">dd_df_from_sqlite_tables</span>
 
 
@@ -156,27 +157,8 @@
     <span class="k">if</span> <span class="n">ad_ids</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">ad_ids</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)</span>
 
-    <span class="c1"># Our fallback is to hit elastic and get every parent of the *speicific&amp; current image</span>
-    <span class="k">return</span> <span class="n">cdr_ad_ids_for_cdr_image_ids</span><span class="p">(</span><span class="n">cdr_image_id</span><span class="p">,</span> <span class="n">es</span><span class="p">)</span></div>
-
-
-<div class="viewcode-block" id="image_stored_url"><a class="viewcode-back" href="../../memex_queries.helpers.html#memex_queries.helpers.image_stored_url">[docs]</a><span class="k">def</span> <span class="nf">image_stored_url</span><span class="p">(</span><span class="n">cdr_image_id</span><span class="p">,</span> <span class="n">es</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    :param str cdr_image_id: A CDR Image ID</span>
-<span class="sd">    :param elasticsearch.Elasticsearch es: CDR Connection (can be omitted)</span>
-<span class="sd">    :returns: `str` -- The image&#39;s stored URL, or `None`</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">try</span><span class="p">:</span>
-        <span class="n">image_json</span> <span class="o">=</span> <span class="n">hbase_row_value</span><span class="p">(</span><span class="s1">&#39;dig_isi_cdr2_ht_images&#39;</span><span class="p">,</span>
-                                     <span class="n">cdr_image_id</span><span class="p">,</span>
-                                     <span class="s1">&#39;images:images&#39;</span><span class="p">)</span>
-        <span class="n">image_url</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span><span class="n">image_json</span><span class="p">)[</span><span class="s1">&#39;obj_stored_url&#39;</span><span class="p">]</span>
-        <span class="k">if</span> <span class="n">image_url</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">image_url</span>
-    <span class="k">except</span><span class="p">:</span>
-        <span class="k">pass</span>
-
-    <span class="k">return</span> <span class="n">stored_url_of_cdr_image_id</span><span class="p">(</span><span class="n">cdr_image_id</span><span class="p">,</span> <span class="n">es</span><span class="p">)</span></div>
+    <span class="c1"># Our fallback is to hit elastic and get every parent of the *specific* current image</span>
+    <span class="k">return</span> <span class="n">cdr_ad_ids_for_cdr_image_ids</span><span class="p">([</span><span class="n">cdr_image_id</span><span class="p">],</span> <span class="n">es</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span></div>
 
 
 <div class="viewcode-block" id="image_hashes"><a class="viewcode-back" href="../../memex_queries.helpers.html#memex_queries.helpers.image_hashes">[docs]</a><span class="k">def</span> <span class="nf">image_hashes</span><span class="p">(</span><span class="n">cdr_image_ids</span><span class="p">,</span> <span class="n">es</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
@@ -210,10 +192,14 @@
     <span class="k">for</span> <span class="n">cdr_image_id</span> <span class="ow">in</span> <span class="n">data_dict</span><span class="p">:</span>
         <span class="k">if</span> <span class="s1">&#39;crawl_data.image_id&#39;</span> <span class="ow">in</span> <span class="n">data_dict</span><span class="p">[</span><span class="n">cdr_image_id</span><span class="p">]:</span>
             <span class="n">hash_dict</span><span class="p">[</span><span class="n">cdr_image_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">hbase_row_value</span><span class="p">(</span><span class="s1">&#39;image_hash&#39;</span><span class="p">,</span>
-                                                      <span class="n">data_dict</span><span class="p">[</span><span class="s1">&#39;crawl_data.image_id&#39;</span><span class="p">],</span>
+                                                      <span class="n">data_dict</span><span class="p">[</span><span class="n">cdr_image_id</span><span class="p">][</span><span class="s1">&#39;crawl_data.image_id&#39;</span><span class="p">],</span>
                                                       <span class="s1">&#39;image:hash&#39;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">hash_dict</span><span class="p">[</span><span class="n">cdr_image_id</span><span class="p">]</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s1">&#39;obj_stored_url&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">data_dict</span><span class="p">:</span>
+                <span class="c1"># No stored URL, so nothing to be done</span>
+                <span class="k">continue</span>
+
             <span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">data_dict</span><span class="p">[</span><span class="s1">&#39;obj_stored_url&#39;</span><span class="p">])</span>
             <span class="n">data</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">text</span>
 
@@ -238,14 +224,16 @@
 
 <div class="viewcode-block" id="post_dates_for_cdr_ad_ids"><a class="viewcode-back" href="../../memex_queries.helpers.html#memex_queries.helpers.post_dates_for_cdr_ad_ids">[docs]</a><span class="k">def</span> <span class="nf">post_dates_for_cdr_ad_ids</span><span class="p">(</span><span class="n">cdr_ad_ids</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Given a list of CDR Ad IDs, find their DD IDs and when they were posted.</span>
+<span class="sd">    Given a list of CDR IDs of advertisements, find their DD IDs and when they were posted.</span>
 
 <span class="sd">    :param list cdr_ad_ids: A list of CDR IDs of escort ads.</span>
 <span class="sd">    :returns: `pandas.DataFrame` -- DataFrame of CDR IDs, DD IDs, and Post Dates</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">dd_id_df</span><span class="p">(</span><span class="n">cdr_ad_ids</span><span class="p">)</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dd_df_from_sqlite_tables</span><span class="p">([</span><span class="n">dd_id_from_cdr_id</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">cdr_ad_ids</span><span class="p">],</span>
-                                                              <span class="s1">&#39;dd_id_to_post_date&#39;</span><span class="p">),</span>
-                                     <span class="n">on</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;dd_id&#39;</span><span class="p">])</span></div>
+    <span class="k">return</span> <span class="n">cdr_df_from_sqlite_tables</span><span class="p">(</span><span class="n">cdr_ad_ids</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;dd_id_to_post_date&#39;</span><span class="p">])</span></div>
+    <span class="c1"># return dd_id_df(cdr_ad_ids).join(dd_df_from_sqlite_tables(</span>
+    <span class="c1">#     [dd_id_from_cdr_id(x) for x in cdr_ad_ids],</span>
+    <span class="c1">#     [&#39;dd_id_to_post_date&#39;]</span>
+    <span class="c1"># ), on=[&#39;dd_id&#39;])</span>
 
 
 <div class="viewcode-block" id="post_dates_for_general_cdr_image_id"><a class="viewcode-back" href="../../memex_queries.helpers.html#memex_queries.helpers.post_dates_for_general_cdr_image_id">[docs]</a><span class="k">def</span> <span class="nf">post_dates_for_general_cdr_image_id</span><span class="p">(</span><span class="n">cdr_image_id</span><span class="p">,</span> <span class="n">es</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
@@ -266,7 +254,6 @@
 <span class="sd">    :param int dd_ad_id: The Deep Dive ID of an escort ad.</span>
 <span class="sd">    :returns: `list` -- The list of CDR IDs of the images used with this ad.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
     <span class="c1"># The HBase table isn&#39;t yet fully populated, so we use sqlite</span>
     <span class="c1"># cdr_ad_id = hbase_row_value(&#39;deepdive_escort_ads&#39;, dd_ad_id, &#39;info:cdr_id&#39;)</span>
     <span class="n">cdr_ad_id</span> <span class="o">=</span> <span class="n">dd_df_from_sqlite_tables</span><span class="p">([</span><span class="n">dd_ad_id</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;dd_id_to_cdr_id&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
