@@ -72,7 +72,7 @@ def cdr_fields_for_cdr_ids(cdr_ids, fields=None, es=None):
 
 def cdr_ad_ids_for_cdr_image_ids(cdr_image_ids, es=None):
     """
-    :param list|str cdr_image_ids: Single CDR ID of an image or a list of \
+    :param list cdr_image_ids: Single CDR ID of an image or a list of \
     CDR IDs of images.
     :param elasticsearch.Elasticsearch es: CDR Connection (can be omitted)
     :returns: `list` -- List of CDR IDs of ads using these images
