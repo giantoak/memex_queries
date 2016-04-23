@@ -53,6 +53,7 @@ create index post_date_dd_ix on dd_id_to_post_date (post_date);
 # However, this was causing *massive* time outs. Unclear why
 # As such, we simply take it on faith that that these have a 1-to-1 match.
 # If they don't, we're in trouble.
+
 create table if not exists dd_id_to_cdr_id (dd_id int, cdr_id text not null);
 .import cdr_escorts_2/cdr/doc_id_mapping.tsv dd_id_to_cdr_id
 create index cdr_id_ix on dd_id_to_cdr_id (cdr_id);

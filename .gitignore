@@ -1,5 +1,5 @@
 *.pyc
 .idea
-memex_queries/helpers/dd_dump.db
+dd_dump.db
 memex_queries/helpers/__pycache__
 _docs_builder

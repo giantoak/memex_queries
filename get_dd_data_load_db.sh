@@ -11,5 +11,5 @@ bunzip2 escort_cdr_2/cdr/rates-text-split.tsv.bz2
 bunzip2 escort_cdr_2/cdr/phones-per-line.tsv.bz2
 bunzip2 escort_cdr_2/cdr/post_date-dom_secs.tsv.bz2
 bunzip2 escort_cdr_2/cdr/doc_id_mapping.tsv.bz2
-sqlite3 memex_queries/HelperFuncs/dd_dump.db < make_dd_sqlite_db.sql
+sqlite3 dd_dump.db < make_dd_sqlite_db.sql
 rm -r escort_cdr_2
