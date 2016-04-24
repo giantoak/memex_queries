@@ -1,8 +1,10 @@
 import datetime as dt
 from helpers import post_dates_for_general_cdr_image_id
 from helpers import cdr_ad_ids_for_general_cdr_image_id
-from helpers.sqlite import dd_df_from_sqlite_tables
-from helpers.hbase import dd_id_for_cdr_ad_id
+from helpers.cdr import cdr_image_ids_for_cdr_ad_ids
+from helpers.sqlite import df_of_tables_for_cdr_ad_ids
+from helpers import df_of_tables_for_cdr_image_ids
+from itertools import chain
 
 
 def query_one(cdr_image_id):
@@ -14,7 +16,7 @@ def query_one(cdr_image_id):
     :param elasticsearch.Elasticsearch es: the elasticsearch index to search
     :returns: `datetime.datetime` --
     """
-    return min(post_dates_for_general_cdr_image_id(cdr_image_id, es))
+    return min(post_dates_for_general_cdr_image_id(cdr_image_id))
 
 
 def query_two(cdr_image_id):
@@ -26,8 +28,8 @@ def query_two(cdr_image_id):
     :param str cdr_image_id: The CDR ID of the image to retrieve
     :returns: `set` --
     """
-    dd_ad_ids = [dd_id_for_cdr_ad_id(x) for x in cdr_ad_ids_for_general_cdr_image_id(cdr_image_id)]
-    df = dd_df_from_sqlite_tables(dd_ad_ids, ['dd_id_to_phone', 'dd_id_to_post_date'])
+    cdr_ad_ids = cdr_ad_ids_for_general_cdr_image_id(cdr_image_id)
+    df = df_of_tables_for_cdr_ad_ids(cdr_ad_ids, ['dd_id_to_phone', 'dd_id_to_post_date'])
     first_date = df.post_date.min()
 
     return set(df.ix[(df.post_date == first_date), 'phone'].values)
@@ -42,11 +44,12 @@ def query_three(cdr_image_id, post_date):
     :param str|datetime.datetime post_date: Date against which to check
     :returns: `set` --
     """
-    dd_ad_ids = [dd_id_for_cdr_ad_id(x) for x in cdr_ad_ids_for_general_cdr_image_id(cdr_image_id)]
-    df = dd_df_from_sqlite_tables(dd_ad_ids, ['dd_id_to_phone', 'dd_id_to_post_date'])
+    cdr_ad_ids = cdr_ad_ids_for_general_cdr_image_id(cdr_image_id)
+    df = df_of_tables_for_cdr_ad_ids(cdr_ad_ids, ['dd_id_to_phone', 'dd_id_to_post_date'])
 
     if isinstance(post_date, str):
-        post_date = dt.datetime(str)
+        from pandas import to_datetime
+        post_date = to_datetime(post_date)
 
     return set(df.ix[df.post_date < post_date, 'phone'])
 
@@ -70,8 +73,9 @@ def query_five(cdr_image_id):
     :param str cdr_image_id: The CDR ID of the image to retrieve
     :returns: `set` --
     """
-    dd_ad_ids = [dd_id_for_cdr_ad_id(x) for x in cdr_ad_ids_for_general_cdr_image_id(cdr_image_id)]
-    return set(dd_df_from_sqlite_tables(dd_ad_ids, ['dd_id_to_phone']).phone)
+    cdr_ad_ids = cdr_ad_ids_for_general_cdr_image_id(cdr_image_id)
+    df = df_of_tables_for_cdr_ad_ids(cdr_ad_ids, ['dd_id_to_phone'])
+    return set(df.phone)
 
 
 def query_six(cdr_image_id):
@@ -96,14 +100,16 @@ def query_seven(cdr_image_id, post_date, phone_number=None):
 
     :return:
     """
-    dd_ad_ids = [dd_id_for_cdr_ad_id(x) for x in cdr_ad_ids_for_general_cdr_image_id(cdr_image_id)]
-    df = dd_df_from_sqlite_tables(dd_ad_ids, ['dd_id_to_phone', 'dd_id_to_post_date'])
+    cdr_ad_ids = cdr_ad_ids_for_general_cdr_image_id(cdr_image_id)
+    df = df_of_tables_for_cdr_ad_ids(cdr_ad_ids, ['dd_id_to_phone', 'dd_id_to_post_date'])
 
     if isinstance(post_date, str):
         post_date = dt.datetime(post_date)
 
-    return set(df.ix[(df.phone != phone_number) & df.post_date < post_date, 'phone'].values)
+    if phone_number is None:
+        phone_number = df.ix[df.post_date == post_date, 'phone']
 
+    return set(df.ix[(df.phone != phone_number) & df.post_date < post_date, 'phone'])
 
 
 def query_eight(cdr_image_id, post_date, phone_number=None):
@@ -117,7 +123,7 @@ def query_eight(cdr_image_id, post_date, phone_number=None):
     :param str phone_number:
     :returns: `int` --
     """
-    return len(query_seven(cdr_image_id, phone_number, post_date))
+    return len(query_seven(cdr_image_id, post_date, phone_number))
 
 
 def query_nine(cdr_ad_id, phone_number=None):
@@ -130,7 +136,17 @@ def query_nine(cdr_ad_id, phone_number=None):
     the numbers extracted from the ad.
     :returns: --
     """
-    dd_ad_id = dd_id_for_cdr_ad_id(cdr_ad_id)
+    cdr_image_ids = cdr_image_ids_for_cdr_ad_ids([cdr_ad_id])[cdr_ad_id]
+
+    cdr_ad_ids = list(set(chain(*[cdr_ad_ids_for_general_cdr_image_id(cdr_image_id)
+                                  for cdr_image_id in cdr_image_ids])
+                          ))
+    df = df_of_tables_for_cdr_ad_ids(cdr_ad_ids, ['dd_id_to_phone', 'dd_id_to_post_date'])
+
+    if phone_number is None:
+        phone_numbers = df.ix[df.cdr_id == cdr_ad_id, 'phone'].tolist()
+    else:
+        phone_numbers = [phone_number]
 
 
 def query_ten(cdr_ad_id):
