@@ -130,32 +130,35 @@
 <span></span><span class="kn">import</span> <span class="nn">datetime</span> <span class="kn">as</span> <span class="nn">dt</span>
 <span class="kn">from</span> <span class="nn">helpers</span> <span class="kn">import</span> <span class="n">post_dates_for_general_cdr_image_id</span>
 <span class="kn">from</span> <span class="nn">helpers</span> <span class="kn">import</span> <span class="n">cdr_ad_ids_for_general_cdr_image_id</span>
-<span class="kn">from</span> <span class="nn">helpers.sqlite</span> <span class="kn">import</span> <span class="n">dd_df_from_sqlite_tables</span>
-<span class="kn">from</span> <span class="nn">helpers.hbase</span> <span class="kn">import</span> <span class="n">dd_id_from_cdr_id</span>
+<span class="kn">from</span> <span class="nn">helpers.cdr</span> <span class="kn">import</span> <span class="n">cdr_image_ids_for_cdr_ad_ids</span>
+<span class="kn">from</span> <span class="nn">helpers.sqlite</span> <span class="kn">import</span> <span class="n">df_of_tables_for_cdr_ad_ids</span>
+<span class="kn">from</span> <span class="nn">helpers</span> <span class="kn">import</span> <span class="n">df_of_tables_for_cdr_image_ids</span>
+<span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">chain</span>
 
 
-<div class="viewcode-block" id="query_one"><a class="viewcode-back" href="../../memex_queries.html#memex_queries.go_images.query_one">[docs]</a><span class="k">def</span> <span class="nf">query_one</span><span class="p">(</span><span class="n">cdr_image_id</span><span class="p">,</span> <span class="n">es</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="query_one"><a class="viewcode-back" href="../../memex_queries.html#memex_queries.go_images.query_one">[docs]</a><span class="k">def</span> <span class="nf">query_one</span><span class="p">(</span><span class="n">cdr_image_id</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    For a given `cdr_image_id`, return the first date that it was posted in \</span>
-<span class="sd">    an ad.</span>
+<span class="sd">    For the general version of a given `cdr_image_id`, return the first \</span>
+<span class="sd">    date that it was posted in an ad.</span>
 
 <span class="sd">    :param str cdr_image_id: The CDR ID of the image to retrieve</span>
 <span class="sd">    :param elasticsearch.Elasticsearch es: the elasticsearch index to search</span>
 <span class="sd">    :returns: `datetime.datetime` --</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="nb">min</span><span class="p">(</span><span class="n">post_dates_for_general_cdr_image_id</span><span class="p">(</span><span class="n">cdr_image_id</span><span class="p">,</span> <span class="n">es</span><span class="p">))</span></div>
+    <span class="k">return</span> <span class="nb">min</span><span class="p">(</span><span class="n">post_dates_for_general_cdr_image_id</span><span class="p">(</span><span class="n">cdr_image_id</span><span class="p">))</span></div>
 
 
 <div class="viewcode-block" id="query_two"><a class="viewcode-back" href="../../memex_queries.html#memex_queries.go_images.query_two">[docs]</a><span class="k">def</span> <span class="nf">query_two</span><span class="p">(</span><span class="n">cdr_image_id</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    For a given `cdr_image_id`, what phone number (or numbers) posted ads \</span>
-<span class="sd">    using `cdr_image_id` on the first date (in the CDR) that it appeared?</span>
+<span class="sd">    For the general version of a`cdr_image_id`, what phone number \</span>
+<span class="sd">    (or numbers) posted ads using `cdr_image_id` on the first date \</span>
+<span class="sd">    that it was posted in an ad?</span>
 
 <span class="sd">    :param str cdr_image_id: The CDR ID of the image to retrieve</span>
 <span class="sd">    :returns: `set` --</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">dd_ad_ids</span> <span class="o">=</span> <span class="p">[</span><span class="n">dd_id_from_cdr_id</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">cdr_ad_ids_for_general_cdr_image_id</span><span class="p">(</span><span class="n">cdr_image_id</span><span class="p">)]</span>
-    <span class="n">df</span> <span class="o">=</span> <span class="n">dd_df_from_sqlite_tables</span><span class="p">(</span><span class="n">dd_ad_ids</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;dd_id_to_phone&#39;</span><span class="p">,</span> <span class="s1">&#39;dd_id_to_post_date&#39;</span><span class="p">])</span>
+    <span class="n">cdr_ad_ids</span> <span class="o">=</span> <span class="n">cdr_ad_ids_for_general_cdr_image_id</span><span class="p">(</span><span class="n">cdr_image_id</span><span class="p">)</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df_of_tables_for_cdr_ad_ids</span><span class="p">(</span><span class="n">cdr_ad_ids</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;dd_id_to_phone&#39;</span><span class="p">,</span> <span class="s1">&#39;dd_id_to_post_date&#39;</span><span class="p">])</span>
     <span class="n">first_date</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">post_date</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
 
     <span class="k">return</span> <span class="nb">set</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">ix</span><span class="p">[(</span><span class="n">df</span><span class="o">.</span><span class="n">post_date</span> <span class="o">==</span> <span class="n">first_date</span><span class="p">),</span> <span class="s1">&#39;phone&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span></div>
@@ -170,11 +173,12 @@
 <span class="sd">    :param str|datetime.datetime post_date: Date against which to check</span>
 <span class="sd">    :returns: `set` --</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">dd_ad_ids</span> <span class="o">=</span> <span class="p">[</span><span class="n">dd_id_from_cdr_id</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">cdr_ad_ids_for_general_cdr_image_id</span><span class="p">(</span><span class="n">cdr_image_id</span><span class="p">)]</span>
-    <span class="n">df</span> <span class="o">=</span> <span class="n">dd_df_from_sqlite_tables</span><span class="p">(</span><span class="n">dd_ad_ids</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;dd_id_to_phone&#39;</span><span class="p">,</span> <span class="s1">&#39;dd_id_to_post_date&#39;</span><span class="p">])</span>
+    <span class="n">cdr_ad_ids</span> <span class="o">=</span> <span class="n">cdr_ad_ids_for_general_cdr_image_id</span><span class="p">(</span><span class="n">cdr_image_id</span><span class="p">)</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df_of_tables_for_cdr_ad_ids</span><span class="p">(</span><span class="n">cdr_ad_ids</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;dd_id_to_phone&#39;</span><span class="p">,</span> <span class="s1">&#39;dd_id_to_post_date&#39;</span><span class="p">])</span>
 
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">post_date</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-        <span class="n">post_date</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+        <span class="kn">from</span> <span class="nn">pandas</span> <span class="kn">import</span> <span class="n">to_datetime</span>
+        <span class="n">post_date</span> <span class="o">=</span> <span class="n">to_datetime</span><span class="p">(</span><span class="n">post_date</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="nb">set</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">post_date</span> <span class="o">&lt;</span> <span class="n">post_date</span><span class="p">,</span> <span class="s1">&#39;phone&#39;</span><span class="p">])</span></div>
 
@@ -198,8 +202,9 @@
 <span class="sd">    :param str cdr_image_id: The CDR ID of the image to retrieve</span>
 <span class="sd">    :returns: `set` --</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">dd_ad_ids</span> <span class="o">=</span> <span class="p">[</span><span class="n">dd_id_from_cdr_id</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">cdr_ad_ids_for_general_cdr_image_id</span><span class="p">(</span><span class="n">cdr_image_id</span><span class="p">)]</span>
-    <span class="k">return</span> <span class="nb">set</span><span class="p">(</span><span class="n">dd_df_from_sqlite_tables</span><span class="p">(</span><span class="n">dd_ad_ids</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;dd_id_to_phone&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">phone</span><span class="p">)</span></div>
+    <span class="n">cdr_ad_ids</span> <span class="o">=</span> <span class="n">cdr_ad_ids_for_general_cdr_image_id</span><span class="p">(</span><span class="n">cdr_image_id</span><span class="p">)</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df_of_tables_for_cdr_ad_ids</span><span class="p">(</span><span class="n">cdr_ad_ids</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;dd_id_to_phone&#39;</span><span class="p">])</span>
+    <span class="k">return</span> <span class="nb">set</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">phone</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="query_six"><a class="viewcode-back" href="../../memex_queries.html#memex_queries.go_images.query_six">[docs]</a><span class="k">def</span> <span class="nf">query_six</span><span class="p">(</span><span class="n">cdr_image_id</span><span class="p">):</span>
@@ -212,38 +217,42 @@
     <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">query_five</span><span class="p">(</span><span class="n">cdr_image_id</span><span class="p">))</span></div>
 
 
-<div class="viewcode-block" id="query_seven"><a class="viewcode-back" href="../../memex_queries.html#memex_queries.go_images.query_seven">[docs]</a><span class="k">def</span> <span class="nf">query_seven</span><span class="p">(</span><span class="n">cdr_image_id</span><span class="p">,</span> <span class="n">phone_number</span><span class="p">,</span> <span class="n">post_date</span><span class="p">):</span>
+<div class="viewcode-block" id="query_seven"><a class="viewcode-back" href="../../memex_queries.html#memex_queries.go_images.query_seven">[docs]</a><span class="k">def</span> <span class="nf">query_seven</span><span class="p">(</span><span class="n">cdr_image_id</span><span class="p">,</span> <span class="n">post_date</span><span class="p">,</span> <span class="n">phone_number</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    For a given `cdr_image_id` posted by `phone_number` on `post_date`</span>
+<span class="sd">    For a given `cdr_image_id` posted on `post_date` by `phone_number`</span>
 <span class="sd">    what phone numbers **other than `phone_number`** posted ads with \</span>
 <span class="sd">    `cdr_image_id` at an earlier date?</span>
 
 <span class="sd">    :param str cdr_image_id: The CDR ID of the image to retrieve</span>
-<span class="sd">    :param str phone_number:</span>
 <span class="sd">    :param str|datetime.datetime post_date: Date against which to check</span>
+<span class="sd">    :param str phone_number:</span>
+
 <span class="sd">    :return:</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">dd_ad_ids</span> <span class="o">=</span> <span class="p">[</span><span class="n">dd_id_from_cdr_id</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">cdr_ad_ids_for_general_cdr_image_id</span><span class="p">(</span><span class="n">cdr_image_id</span><span class="p">)]</span>
-    <span class="n">df</span> <span class="o">=</span> <span class="n">dd_df_from_sqlite_tables</span><span class="p">(</span><span class="n">dd_ad_ids</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;dd_id_to_phone&#39;</span><span class="p">,</span> <span class="s1">&#39;dd_id_to_post_date&#39;</span><span class="p">])</span>
+    <span class="n">cdr_ad_ids</span> <span class="o">=</span> <span class="n">cdr_ad_ids_for_general_cdr_image_id</span><span class="p">(</span><span class="n">cdr_image_id</span><span class="p">)</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df_of_tables_for_cdr_ad_ids</span><span class="p">(</span><span class="n">cdr_ad_ids</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;dd_id_to_phone&#39;</span><span class="p">,</span> <span class="s1">&#39;dd_id_to_post_date&#39;</span><span class="p">])</span>
 
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">post_date</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
         <span class="n">post_date</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="n">post_date</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="nb">set</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">ix</span><span class="p">[(</span><span class="n">df</span><span class="o">.</span><span class="n">phone</span> <span class="o">!=</span> <span class="n">phone_number</span><span class="p">)</span> <span class="o">&amp;</span> <span class="n">df</span><span class="o">.</span><span class="n">post_date</span> <span class="o">&lt;</span> <span class="n">post_date</span><span class="p">,</span> <span class="s1">&#39;phone&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span></div>
+    <span class="k">if</span> <span class="n">phone_number</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">phone_number</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">post_date</span> <span class="o">==</span> <span class="n">post_date</span><span class="p">,</span> <span class="s1">&#39;phone&#39;</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="nb">set</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">ix</span><span class="p">[(</span><span class="n">df</span><span class="o">.</span><span class="n">phone</span> <span class="o">!=</span> <span class="n">phone_number</span><span class="p">)</span> <span class="o">&amp;</span> <span class="n">df</span><span class="o">.</span><span class="n">post_date</span> <span class="o">&lt;</span> <span class="n">post_date</span><span class="p">,</span> <span class="s1">&#39;phone&#39;</span><span class="p">])</span></div>
 
 
-<div class="viewcode-block" id="query_eight"><a class="viewcode-back" href="../../memex_queries.html#memex_queries.go_images.query_eight">[docs]</a><span class="k">def</span> <span class="nf">query_eight</span><span class="p">(</span><span class="n">cdr_image_id</span><span class="p">,</span> <span class="n">phone_number</span><span class="p">,</span> <span class="n">post_date</span><span class="p">):</span>
+<div class="viewcode-block" id="query_eight"><a class="viewcode-back" href="../../memex_queries.html#memex_queries.go_images.query_eight">[docs]</a><span class="k">def</span> <span class="nf">query_eight</span><span class="p">(</span><span class="n">cdr_image_id</span><span class="p">,</span> <span class="n">post_date</span><span class="p">,</span> <span class="n">phone_number</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    For a given `cdr_image_id` posted by `phone_number` at `post_date`, \</span>
 <span class="sd">    **how many** phone numbers other than `phone_number`-posted ads with \</span>
 <span class="sd">    `cdr_image_id` at an earlier date?</span>
 
 <span class="sd">    :param str cdr_image_id: The CDR ID of the image to retrieve</span>
-<span class="sd">    :param str phone_number:</span>
 <span class="sd">    :param str|datetime.datetime post_date: Date against which to check</span>
+<span class="sd">    :param str phone_number:</span>
 <span class="sd">    :returns: `int` --</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">query_seven</span><span class="p">(</span><span class="n">cdr_image_id</span><span class="p">,</span> <span class="n">phone_number</span><span class="p">,</span> <span class="n">post_date</span><span class="p">))</span></div>
+    <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">query_seven</span><span class="p">(</span><span class="n">cdr_image_id</span><span class="p">,</span> <span class="n">post_date</span><span class="p">,</span> <span class="n">phone_number</span><span class="p">))</span></div>
 
 
 <div class="viewcode-block" id="query_nine"><a class="viewcode-back" href="../../memex_queries.html#memex_queries.go_images.query_nine">[docs]</a><span class="k">def</span> <span class="nf">query_nine</span><span class="p">(</span><span class="n">cdr_ad_id</span><span class="p">,</span> <span class="n">phone_number</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
@@ -252,10 +261,21 @@
 <span class="sd">    images were first used in ads posted by by phone numbers other than P?</span>
 
 <span class="sd">    :param str cdr_ad_id: The CDR ID of an ad</span>
-<span class="sd">    :param str phone_number:</span>
+<span class="sd">    :param str phone_number: The phone_number to use. if None, use all of \</span>
+<span class="sd">    the numbers extracted from the ad.</span>
 <span class="sd">    :returns: --</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">dd_ad_id</span> <span class="o">=</span> <span class="n">dd_id_from_cdr_id</span><span class="p">(</span><span class="n">cdr_ad_id</span><span class="p">)</span></div>
+    <span class="n">cdr_image_ids</span> <span class="o">=</span> <span class="n">cdr_image_ids_for_cdr_ad_ids</span><span class="p">([</span><span class="n">cdr_ad_id</span><span class="p">])[</span><span class="n">cdr_ad_id</span><span class="p">]</span>
+
+    <span class="n">cdr_ad_ids</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">chain</span><span class="p">(</span><span class="o">*</span><span class="p">[</span><span class="n">cdr_ad_ids_for_general_cdr_image_id</span><span class="p">(</span><span class="n">cdr_image_id</span><span class="p">)</span>
+                                  <span class="k">for</span> <span class="n">cdr_image_id</span> <span class="ow">in</span> <span class="n">cdr_image_ids</span><span class="p">])</span>
+                          <span class="p">))</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df_of_tables_for_cdr_ad_ids</span><span class="p">(</span><span class="n">cdr_ad_ids</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;dd_id_to_phone&#39;</span><span class="p">,</span> <span class="s1">&#39;dd_id_to_post_date&#39;</span><span class="p">])</span>
+
+    <span class="k">if</span> <span class="n">phone_number</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">phone_numbers</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">cdr_id</span> <span class="o">==</span> <span class="n">cdr_ad_id</span><span class="p">,</span> <span class="s1">&#39;phone&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">phone_numbers</span> <span class="o">=</span> <span class="p">[</span><span class="n">phone_number</span><span class="p">]</span></div>
 
 
 <div class="viewcode-block" id="query_ten"><a class="viewcode-back" href="../../memex_queries.html#memex_queries.go_images.query_ten">[docs]</a><span class="k">def</span> <span class="nf">query_ten</span><span class="p">(</span><span class="n">cdr_ad_id</span><span class="p">):</span>

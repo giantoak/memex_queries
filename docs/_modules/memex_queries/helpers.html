@@ -127,16 +127,13 @@
            <div itemprop="articleBody">
             
   <h1>Source code for memex_queries.helpers</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">.cdr</span> <span class="kn">import</span> <span class="n">stored_url_of_cdr_image_id</span>
-<span class="kn">from</span> <span class="nn">.cdr</span> <span class="kn">import</span> <span class="n">cdr_ad_ids_for_cdr_image_ids</span>
+<span></span><span class="kn">from</span> <span class="nn">.cdr</span> <span class="kn">import</span> <span class="n">cdr_ad_ids_for_cdr_image_ids</span>
 <span class="kn">from</span> <span class="nn">.cdr</span> <span class="kn">import</span> <span class="n">cdr_fields_for_cdr_ids</span>
 <span class="kn">from</span> <span class="nn">.cdr</span> <span class="kn">import</span> <span class="n">cdr_image_ids_for_cdr_ad_ids</span>
-<span class="kn">from</span> <span class="nn">.hbase</span> <span class="kn">import</span> <span class="n">cdr_id_from_dd_id</span>
-<span class="kn">from</span> <span class="nn">.hbase</span> <span class="kn">import</span> <span class="n">dd_id_from_cdr_id</span>
-<span class="kn">from</span> <span class="nn">.hbase</span> <span class="kn">import</span> <span class="n">dd_id_df</span>
 <span class="kn">from</span> <span class="nn">.hbase</span> <span class="kn">import</span> <span class="n">hbase_row_value</span>
-<span class="kn">from</span> <span class="nn">.sqlite</span> <span class="kn">import</span> <span class="n">cdr_df_from_sqlite_tables</span>
-<span class="kn">from</span> <span class="nn">.sqlite</span> <span class="kn">import</span> <span class="n">dd_df_from_sqlite_tables</span>
+<span class="kn">from</span> <span class="nn">.sqlite</span> <span class="kn">import</span> <span class="n">df_of_tables_for_cdr_ad_ids</span>
+<span class="kn">from</span> <span class="nn">.sqlite</span> <span class="kn">import</span> <span class="n">df_of_tables_for_dd_ids</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
 
 
 <div class="viewcode-block" id="cdr_ad_ids_for_general_cdr_image_id"><a class="viewcode-back" href="../../memex_queries.helpers.html#memex_queries.helpers.cdr_ad_ids_for_general_cdr_image_id">[docs]</a><span class="k">def</span> <span class="nf">cdr_ad_ids_for_general_cdr_image_id</span><span class="p">(</span><span class="n">cdr_image_id</span><span class="p">,</span> <span class="n">es</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
@@ -229,8 +226,8 @@
 <span class="sd">    :param list cdr_ad_ids: A list of CDR IDs of escort ads.</span>
 <span class="sd">    :returns: `pandas.DataFrame` -- DataFrame of CDR IDs, DD IDs, and Post Dates</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">cdr_df_from_sqlite_tables</span><span class="p">(</span><span class="n">cdr_ad_ids</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;dd_id_to_post_date&#39;</span><span class="p">])</span></div>
-    <span class="c1"># return dd_id_df(cdr_ad_ids).join(dd_df_from_sqlite_tables(</span>
+    <span class="k">return</span> <span class="n">df_of_tables_for_cdr_ad_ids</span><span class="p">(</span><span class="n">cdr_ad_ids</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;dd_id_to_post_date&#39;</span><span class="p">])</span></div>
+    <span class="c1"># return dd_id_df(cdr_ad_ids).join(df_of_tables_for_dd_ids(</span>
     <span class="c1">#     [dd_id_from_cdr_id(x) for x in cdr_ad_ids],</span>
     <span class="c1">#     [&#39;dd_id_to_post_date&#39;]</span>
     <span class="c1"># ), on=[&#39;dd_id&#39;])</span>
@@ -256,9 +253,21 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># The HBase table isn&#39;t yet fully populated, so we use sqlite</span>
     <span class="c1"># cdr_ad_id = hbase_row_value(&#39;deepdive_escort_ads&#39;, dd_ad_id, &#39;info:cdr_id&#39;)</span>
-    <span class="n">cdr_ad_id</span> <span class="o">=</span> <span class="n">dd_df_from_sqlite_tables</span><span class="p">([</span><span class="n">dd_ad_id</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;dd_id_to_cdr_id&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="n">cdr_ad_id</span> <span class="o">=</span> <span class="n">df_of_tables_for_dd_ids</span><span class="p">([</span><span class="n">dd_ad_id</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;dd_id_to_cdr_id&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
     <span class="n">ad_image_dict</span> <span class="o">=</span> <span class="n">cdr_image_ids_for_cdr_ad_ids</span><span class="p">(</span><span class="n">cdr_ad_id</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">ad_image_dict</span><span class="p">[</span><span class="n">cdr_ad_id</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="df_of_tables_for_cdr_image_ids"><a class="viewcode-back" href="../../memex_queries.helpers.html#memex_queries.helpers.df_of_tables_for_cdr_image_ids">[docs]</a><span class="k">def</span> <span class="nf">df_of_tables_for_cdr_image_ids</span><span class="p">(</span><span class="n">cdr_image_ids</span><span class="p">,</span> <span class="n">sqlite_tables</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    :param list cdr_image_ids: List of CDR IDs for images.</span>
+<span class="sd">    :param list sqlite_tables: List of target SQLite / Deep Dive tables.</span>
+<span class="sd">    :returns: `pandas.DataFrame` -- DataFrame of CDR Image IDS, CDR Ad IDS, DD IDs, and other desired tables.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">cdr_ad_ids</span> <span class="o">=</span> <span class="n">cdr_ad_ids_for_cdr_image_ids</span><span class="p">(</span><span class="n">cdr_image_ids</span><span class="p">)</span>
+    <span class="n">ad_image_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;cdr_id&#39;</span><span class="p">:</span> <span class="n">cdr_ad_ids</span><span class="p">,</span> <span class="s1">&#39;cdr_image_id&#39;</span><span class="p">:</span> <span class="n">cdr_image_ids</span><span class="p">})</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df_of_tables_for_cdr_ad_ids</span><span class="p">(</span><span class="n">cdr_ad_ids</span><span class="p">,</span> <span class="n">sqlite_tables</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">ad_image_df</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="s1">&#39;cdr_id&#39;</span><span class="p">)</span></div>
 </pre></div>
 
            </div>
