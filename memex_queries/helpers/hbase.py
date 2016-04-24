@@ -20,7 +20,7 @@ def hbase_row_value(table, row_id, key_id):
     return None
 
 
-def dd_id_from_cdr_id(cdr_ad_id):
+def dd_id_for_cdr_ad_id(cdr_ad_id):
     """
     :param str cdr_ad_id: The CDR ID of a scraped escort ad.
     :returns: `int` -- The Deep Dive ID that maps to the CDR ID
@@ -28,7 +28,7 @@ def dd_id_from_cdr_id(cdr_ad_id):
     return int(hbase_row_value('cdr_id_to_dd_id', cdr_ad_id, 'info:dd_id'))
 
 
-def cdr_id_from_dd_id(dd_id):
+def cdr_ad_id_for_dd_id(dd_id):
     """
     **THIS SECTION OF THE HBASE TABLE IS INCOMPLETE. DO NOT USE THIS /
     FUNCTION YET.** Instead, reference the `dd_id_to_cdr_id` table in SQLite.
@@ -39,7 +39,7 @@ def cdr_id_from_dd_id(dd_id):
     return hbase_row_value('deepdive_escort_ads', str(dd_id), 'info:cdr_id')
 
 
-def dd_id_df(cdr_ad_ids):
+def dd_id_df_for_cdr_ad_ids(cdr_ad_ids):
     """
     :param list cdr_ad_ids: A list of CDR IDs of ads.
     :returns: `pandas.DataFrame` -- A two column DataFrame containing \

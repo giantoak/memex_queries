@@ -2,7 +2,7 @@ import datetime as dt
 from helpers import post_dates_for_general_cdr_image_id
 from helpers import cdr_ad_ids_for_general_cdr_image_id
 from helpers.sqlite import dd_df_from_sqlite_tables
-from helpers.hbase import dd_id_from_cdr_id
+from helpers.hbase import dd_id_for_cdr_ad_id
 
 
 def query_one(cdr_image_id, es=None):
@@ -25,7 +25,7 @@ def query_two(cdr_image_id):
     :param str cdr_image_id: The CDR ID of the image to retrieve
     :returns: `set` --
     """
-    dd_ad_ids = [dd_id_from_cdr_id(x) for x in cdr_ad_ids_for_general_cdr_image_id(cdr_image_id)]
+    dd_ad_ids = [dd_id_for_cdr_ad_id(x) for x in cdr_ad_ids_for_general_cdr_image_id(cdr_image_id)]
     df = dd_df_from_sqlite_tables(dd_ad_ids, ['dd_id_to_phone', 'dd_id_to_post_date'])
     first_date = df.post_date.min()
 
@@ -41,7 +41,7 @@ def query_three(cdr_image_id, post_date):
     :param str|datetime.datetime post_date: Date against which to check
     :returns: `set` --
     """
-    dd_ad_ids = [dd_id_from_cdr_id(x) for x in cdr_ad_ids_for_general_cdr_image_id(cdr_image_id)]
+    dd_ad_ids = [dd_id_for_cdr_ad_id(x) for x in cdr_ad_ids_for_general_cdr_image_id(cdr_image_id)]
     df = dd_df_from_sqlite_tables(dd_ad_ids, ['dd_id_to_phone', 'dd_id_to_post_date'])
 
     if isinstance(post_date, str):
@@ -69,7 +69,7 @@ def query_five(cdr_image_id):
     :param str cdr_image_id: The CDR ID of the image to retrieve
     :returns: `set` --
     """
-    dd_ad_ids = [dd_id_from_cdr_id(x) for x in cdr_ad_ids_for_general_cdr_image_id(cdr_image_id)]
+    dd_ad_ids = [dd_id_for_cdr_ad_id(x) for x in cdr_ad_ids_for_general_cdr_image_id(cdr_image_id)]
     return set(dd_df_from_sqlite_tables(dd_ad_ids, ['dd_id_to_phone']).phone)
 
 
@@ -94,7 +94,7 @@ def query_seven(cdr_image_id, phone_number, post_date):
     :param str|datetime.datetime post_date: Date against which to check
     :return:
     """
-    dd_ad_ids = [dd_id_from_cdr_id(x) for x in cdr_ad_ids_for_general_cdr_image_id(cdr_image_id)]
+    dd_ad_ids = [dd_id_for_cdr_ad_id(x) for x in cdr_ad_ids_for_general_cdr_image_id(cdr_image_id)]
     df = dd_df_from_sqlite_tables(dd_ad_ids, ['dd_id_to_phone', 'dd_id_to_post_date'])
 
     if isinstance(post_date, str):
@@ -126,7 +126,7 @@ def query_nine(cdr_ad_id, phone_number=None):
     :param str phone_number:
     :returns: --
     """
-    dd_ad_id = dd_id_from_cdr_id(cdr_ad_id)
+    dd_ad_id = dd_id_for_cdr_ad_id(cdr_ad_id)
 
 
 def query_ten(cdr_ad_id):
