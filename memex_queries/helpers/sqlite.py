@@ -15,7 +15,7 @@ def new_sqlite_con():
     return local_sqlite
 
 
-def dd_df_from_sqlite_tables(dd_ids, sqlite_tables, sql_con=None):
+def df_of_tables_for_dd_ids(dd_ids, sqlite_tables, sql_con=None):
     """
     :param list dd_ids: list of Deep Dive IDs to retrieve
     :param list sqlite_tables: list of SQLite tables to join
@@ -47,7 +47,7 @@ def dd_df_from_sqlite_tables(dd_ids, sqlite_tables, sql_con=None):
     return df
 
 
-def cdr_df_from_sqlite_tables(cdr_ad_ids, sqlite_tables, sql_con=None):
+def df_of_tables_for_cdr_ad_ids(cdr_ad_ids, sqlite_tables, sql_con=None):
     """
     :param list cdr_ad_ids: list of CDR Ad IDs to match with deep dive data
     :param list sqlite_tables: list of SQLite tables to join
@@ -64,7 +64,7 @@ def cdr_df_from_sqlite_tables(cdr_ad_ids, sqlite_tables, sql_con=None):
         sql_con = new_sqlite_con()
 
     df = read_sql('select * from dd_id_to_cdr_id where cdr_id in ({})'.format(cdr_ids_str), sql_con)
-    df_2 = dd_df_from_sqlite_tables(list(df.dd_id), [x for x in sqlite_tables if x != 'dd_id_to_cdr_id'], sql_con)
+    df_2 = df_of_tables_for_dd_ids(list(df.dd_id), [x for x in sqlite_tables if x != 'dd_id_to_cdr_id'], sql_con)
 
     return df.merge(df_2, on=['dd_id'], how='outer')
 
@@ -77,4 +77,4 @@ def get_phones_for_dd_ids(dd_ids, sql_con=None):
     :returns: `pandas.DataFrame` -- Data Frame of Deep Dive IDs and the phone \
     numbers assigned to them.
     """
-    return dd_df_from_sqlite_tables(dd_ids, ['dd_id_to_phone'], sql_con)
+    return df_of_tables_for_dd_ids(dd_ids, ['dd_id_to_phone'], sql_con)

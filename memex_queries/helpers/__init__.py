@@ -2,8 +2,9 @@ from .cdr import cdr_ad_ids_for_cdr_image_ids
 from .cdr import cdr_fields_for_cdr_ids
 from .cdr import cdr_image_ids_for_cdr_ad_ids
 from .hbase import hbase_row_value
-from .sqlite import cdr_df_from_sqlite_tables
-from .sqlite import dd_df_from_sqlite_tables
+from .sqlite import df_of_tables_for_cdr_ad_ids
+from .sqlite import df_of_tables_for_dd_ids
+import pandas as pd
 
 
 def cdr_ad_ids_for_general_cdr_image_id(cdr_image_id, es=None):
@@ -96,8 +97,8 @@ def post_dates_for_cdr_ad_ids(cdr_ad_ids):
     :param list cdr_ad_ids: A list of CDR IDs of escort ads.
     :returns: `pandas.DataFrame` -- DataFrame of CDR IDs, DD IDs, and Post Dates
     """
-    return cdr_df_from_sqlite_tables(cdr_ad_ids, ['dd_id_to_post_date'])
-    # return dd_id_df(cdr_ad_ids).join(dd_df_from_sqlite_tables(
+    return df_of_tables_for_cdr_ad_ids(cdr_ad_ids, ['dd_id_to_post_date'])
+    # return dd_id_df(cdr_ad_ids).join(df_of_tables_for_dd_ids(
     #     [dd_id_from_cdr_id(x) for x in cdr_ad_ids],
     #     ['dd_id_to_post_date']
     # ), on=['dd_id'])
@@ -123,6 +124,6 @@ def cdr_image_ids_for_dd_ad_id(dd_ad_id):
     """
     # The HBase table isn't yet fully populated, so we use sqlite
     # cdr_ad_id = hbase_row_value('deepdive_escort_ads', dd_ad_id, 'info:cdr_id')
-    cdr_ad_id = dd_df_from_sqlite_tables([dd_ad_id], ['dd_id_to_cdr_id']).iloc[0, 1]
+    cdr_ad_id = df_of_tables_for_dd_ids([dd_ad_id], ['dd_id_to_cdr_id']).iloc[0, 1]
     ad_image_dict = cdr_image_ids_for_cdr_ad_ids(cdr_ad_id)
     return ad_image_dict[cdr_ad_id]

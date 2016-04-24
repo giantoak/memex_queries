@@ -48,6 +48,6 @@ def dd_id_df_for_cdr_ad_ids(cdr_ad_ids):
     """
     from pandas import DataFrame
     return DataFrame({'cdr_id': cdr_ad_ids,
-                      'dd_id': [dd_id_from_cdr_id(cdr_ad_id)
+                      'dd_id': [dd_id_for_cdr_ad_id(cdr_ad_id)
                                 for cdr_ad_id in cdr_ad_ids]
                       })
