@@ -127,3 +127,15 @@ def cdr_image_ids_for_dd_ad_id(dd_ad_id):
     cdr_ad_id = df_of_tables_for_dd_ids([dd_ad_id], ['dd_id_to_cdr_id']).iloc[0, 1]
     ad_image_dict = cdr_image_ids_for_cdr_ad_ids(cdr_ad_id)
     return ad_image_dict[cdr_ad_id]
+
+
+def df_of_tables_for_cdr_image_ids(cdr_image_ids, sqlite_tables):
+    """
+    :param list cdr_image_ids: List of CDR IDs for images.
+    :param list sqlite_tables: List of target SQLite / Deep Dive tables.
+    :returns: `pandas.DataFrame` -- DataFrame of CDR Image IDS, CDR Ad IDS, DD IDs, and other desired tables.
+    """
+    cdr_ad_ids = cdr_ad_ids_for_cdr_image_ids(cdr_image_ids)
+    ad_image_df = pd.DataFrame({'cdr_id': cdr_ad_ids, 'cdr_image_id': cdr_image_ids})
+    df = df_of_tables_for_cdr_ad_ids(cdr_ad_ids, sqlite_tables)
+    return ad_image_df.join(df, on='cdr_id')
