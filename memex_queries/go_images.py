@@ -5,10 +5,10 @@ from helpers.sqlite import dd_df_from_sqlite_tables
 from helpers.hbase import dd_id_for_cdr_ad_id
 
 
-def query_one(cdr_image_id, es=None):
+def query_one(cdr_image_id):
     """
-    For a given `cdr_image_id`, return the first date that it was posted in \
-    an ad.
+    For the general version of a given `cdr_image_id`, return the first \
+    date that it was posted in an ad.
 
     :param str cdr_image_id: The CDR ID of the image to retrieve
     :param elasticsearch.Elasticsearch es: the elasticsearch index to search
@@ -19,8 +19,9 @@ def query_one(cdr_image_id, es=None):
 
 def query_two(cdr_image_id):
     """
-    For a given `cdr_image_id`, what phone number (or numbers) posted ads \
-    using `cdr_image_id` on the first date (in the CDR) that it appeared?
+    For the general version of a`cdr_image_id`, what phone number \
+    (or numbers) posted ads using `cdr_image_id` on the first date \
+    that it was posted in an ad?
 
     :param str cdr_image_id: The CDR ID of the image to retrieve
     :returns: `set` --
@@ -83,15 +84,16 @@ def query_six(cdr_image_id):
     return len(query_five(cdr_image_id))
 
 
-def query_seven(cdr_image_id, phone_number, post_date):
+def query_seven(cdr_image_id, post_date, phone_number=None):
     """
-    For a given `cdr_image_id` posted by `phone_number` on `post_date`
+    For a given `cdr_image_id` posted on `post_date` by `phone_number`
     what phone numbers **other than `phone_number`** posted ads with \
     `cdr_image_id` at an earlier date?
 
     :param str cdr_image_id: The CDR ID of the image to retrieve
-    :param str phone_number:
     :param str|datetime.datetime post_date: Date against which to check
+    :param str phone_number:
+
     :return:
     """
     dd_ad_ids = [dd_id_for_cdr_ad_id(x) for x in cdr_ad_ids_for_general_cdr_image_id(cdr_image_id)]
@@ -103,15 +105,16 @@ def query_seven(cdr_image_id, phone_number, post_date):
     return set(df.ix[(df.phone != phone_number) & df.post_date < post_date, 'phone'].values)
 
 
-def query_eight(cdr_image_id, phone_number, post_date):
+
+def query_eight(cdr_image_id, post_date, phone_number=None):
     """
     For a given `cdr_image_id` posted by `phone_number` at `post_date`, \
     **how many** phone numbers other than `phone_number`-posted ads with \
     `cdr_image_id` at an earlier date?
 
     :param str cdr_image_id: The CDR ID of the image to retrieve
-    :param str phone_number:
     :param str|datetime.datetime post_date: Date against which to check
+    :param str phone_number:
     :returns: `int` --
     """
     return len(query_seven(cdr_image_id, phone_number, post_date))
@@ -123,7 +126,8 @@ def query_nine(cdr_ad_id, phone_number=None):
     images were first used in ads posted by by phone numbers other than P?
 
     :param str cdr_ad_id: The CDR ID of an ad
-    :param str phone_number:
+    :param str phone_number: The phone_number to use. if None, use all of \
+    the numbers extracted from the ad.
     :returns: --
     """
     dd_ad_id = dd_id_for_cdr_ad_id(cdr_ad_id)
