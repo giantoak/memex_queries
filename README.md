@@ -113,9 +113,16 @@ Term | Meaning
 :--- |:---
 CDR Ad ID | The `_id` of an advertisement in the CDR.
 CDR Image ID | The `_id` of an image in the CDR. Each image has an ad as its parent
-General CDR Image ID | A notional `_id`; the set of all CDR Image IDs for images that have identical hashes. (That is, that are actually the same image.
+General CDR Image ID | A notional `_id`; the set of all CDR Image IDs for images that are functionally 
+identical. At present, this means a SHA hash, but it could also be ascribed to other similarity services.
 DD ID | The ID of an advertisement in the most recent dump of the Deep Dive Data, a.k.a Lattice Data, a.ka. Stanford Data.
 
+# Future Plans
+
+This is v.0.0 of this product, and was initially developed to facilitate
+image comparisons by Giant Oak. *Future* versions of this library should put
+the general problem of connecting data sources first. That would hopefully limit some amount of growth
+in the number of generic functions being created.
 
 [HBase]: https://hbase.apache.org/ "Apache HBase"
 [Elasticsearch]: https://www.elastic.co/products/elasticsearch "Elastic Elasticsearch"
