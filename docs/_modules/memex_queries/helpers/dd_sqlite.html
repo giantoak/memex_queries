@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>memex_queries.helpers.sqlite &mdash; memex_queries 0.0.1 documentation</title>
+  <title>memex_queries.helpers.dd_sqlite &mdash; memex_queries 0.0.1 documentation</title>
   
 
   
@@ -116,7 +116,7 @@
       
           <li><a href="../helpers.html">memex_queries.helpers</a> &raquo;</li>
       
-    <li>memex_queries.helpers.sqlite</li>
+    <li>memex_queries.helpers.dd_sqlite</li>
       <li class="wy-breadcrumbs-aside">
         
           
@@ -128,12 +128,12 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <h1>Source code for memex_queries.helpers.sqlite</h1><div class="highlight"><pre>
+  <h1>Source code for memex_queries.helpers.dd_sqlite</h1><div class="highlight"><pre>
 <span></span><span class="n">SQLITE_FILE</span> <span class="o">=</span> <span class="s1">&#39;dd_dump.db&#39;</span>
 <span class="n">local_sqlite</span> <span class="o">=</span> <span class="bp">None</span>
 
 
-<div class="viewcode-block" id="new_sqlite_con"><a class="viewcode-back" href="../../../memex_queries.helpers.html#memex_queries.helpers.sqlite.new_sqlite_con">[docs]</a><span class="k">def</span> <span class="nf">new_sqlite_con</span><span class="p">():</span>
+<div class="viewcode-block" id="new_sqlite_con"><a class="viewcode-back" href="../../../memex_queries.helpers.html#memex_queries.helpers.dd_sqlite.new_sqlite_con">[docs]</a><span class="k">def</span> <span class="nf">new_sqlite_con</span><span class="p">():</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :returns: `sqlalchemy.create_engine` -- Connection to the SQLite database.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -146,7 +146,7 @@
     <span class="k">return</span> <span class="n">local_sqlite</span></div>
 
 
-<div class="viewcode-block" id="df_of_tables_for_dd_ids"><a class="viewcode-back" href="../../../memex_queries.helpers.html#memex_queries.helpers.sqlite.df_of_tables_for_dd_ids">[docs]</a><span class="k">def</span> <span class="nf">df_of_tables_for_dd_ids</span><span class="p">(</span><span class="n">dd_ids</span><span class="p">,</span> <span class="n">sqlite_tables</span><span class="p">,</span> <span class="n">sql_con</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="df_of_tables_for_dd_ids"><a class="viewcode-back" href="../../../memex_queries.helpers.html#memex_queries.helpers.dd_sqlite.df_of_tables_for_dd_ids">[docs]</a><span class="k">def</span> <span class="nf">df_of_tables_for_dd_ids</span><span class="p">(</span><span class="n">dd_ids</span><span class="p">,</span> <span class="n">sqlite_tables</span><span class="p">,</span> <span class="n">sql_con</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param list dd_ids: list of Deep Dive IDs to retrieve</span>
 <span class="sd">    :param list sqlite_tables: list of SQLite tables to join</span>
@@ -178,7 +178,7 @@
     <span class="k">return</span> <span class="n">df</span></div>
 
 
-<div class="viewcode-block" id="df_of_tables_for_cdr_ad_ids"><a class="viewcode-back" href="../../../memex_queries.helpers.html#memex_queries.helpers.sqlite.df_of_tables_for_cdr_ad_ids">[docs]</a><span class="k">def</span> <span class="nf">df_of_tables_for_cdr_ad_ids</span><span class="p">(</span><span class="n">cdr_ad_ids</span><span class="p">,</span> <span class="n">sqlite_tables</span><span class="p">,</span> <span class="n">sql_con</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="df_of_tables_for_cdr_ad_ids"><a class="viewcode-back" href="../../../memex_queries.helpers.html#memex_queries.helpers.dd_sqlite.df_of_tables_for_cdr_ad_ids">[docs]</a><span class="k">def</span> <span class="nf">df_of_tables_for_cdr_ad_ids</span><span class="p">(</span><span class="n">cdr_ad_ids</span><span class="p">,</span> <span class="n">sqlite_tables</span><span class="p">,</span> <span class="n">sql_con</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param list cdr_ad_ids: list of CDR Ad IDs to match with deep dive data</span>
 <span class="sd">    :param list sqlite_tables: list of SQLite tables to join</span>
@@ -200,7 +200,7 @@
     <span class="k">return</span> <span class="n">df</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">df_2</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;dd_id&#39;</span><span class="p">],</span> <span class="n">how</span><span class="o">=</span><span class="s1">&#39;outer&#39;</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="get_phones_for_dd_ids"><a class="viewcode-back" href="../../../memex_queries.helpers.html#memex_queries.helpers.sqlite.get_phones_for_dd_ids">[docs]</a><span class="k">def</span> <span class="nf">get_phones_for_dd_ids</span><span class="p">(</span><span class="n">dd_ids</span><span class="p">,</span> <span class="n">sql_con</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="get_phones_for_dd_ids"><a class="viewcode-back" href="../../../memex_queries.helpers.html#memex_queries.helpers.dd_sqlite.get_phones_for_dd_ids">[docs]</a><span class="k">def</span> <span class="nf">get_phones_for_dd_ids</span><span class="p">(</span><span class="n">dd_ids</span><span class="p">,</span> <span class="n">sql_con</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param list dd_ids: List of Deep Dive IDs</span>
 <span class="sd">    :param sqlalchemy.create_engine sql_con: Connection to SQLite (can be \</span>

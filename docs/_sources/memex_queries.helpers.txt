@@ -1,11 +1,42 @@
 memex_queries.helpers package
 =============================
+These are lower-level helper functions that can be used as components of high-level
+queries; they should hit MEMEX resources directly.
+The Deep Dive data is currently stored locally, within a [SQLite] database.
+Functions should  *generally* be named  along the lines of:
+
+* ``B_of_A_for_Y_of_X``
+* ``B_of_A_from_Y_of_X``
+* ``A_B_for_X_Y``
+* ``A_B_from_X_Y``
+
+where:
+
+* ``B`` is the data structure holding the output
+* ``A`` is a reasonable shorthand for the desired output content.
+* ``Y`` is a reasonable shorthand for the input data structure
+* ``X`` is a reasonable shorthand for the output data structure.
+
+``B`` and ``Y`` may be omitted.
+
+.. code-block:: python
+   :linenos:
+
+   > # Sample high-level query using low-level components:
+   > def memex_query_three(image_cdr_id):
+   >   from helpers.cdr import cdr_ad_ids_for_cdr_image_ids
+   >   from helpers.hbase import df_of_dd_ids_for_cdr_ad_ids
+   >
+   >   cdr_ad_ids = cdr_ad_ids_for_cdr_image_ids(cdr_image_ids)
+   >   df = df_of_dd_ids_for_cdr_ad_ids(cdr_ad_ids)
+   >   return list(data_related_to_ads)
 
 Submodules
 ----------
 
 memex_queries.helpers.cdr module
 --------------------------------
+Functions for interacting with the CDR.
 
 .. automodule:: memex_queries.helpers.cdr
     :members:
@@ -16,6 +47,7 @@ memex_queries.helpers.cdr module
 
 memex_queries.helpers.hbase module
 ----------------------------------
+Functions for interacting with the MEMEX HBase.
 
 .. automodule:: memex_queries.helpers.hbase
     :members:
@@ -24,10 +56,11 @@ memex_queries.helpers.hbase module
     :undoc-members:
     :show-inheritance:
 
-memex_queries.helpers.sqlite module
------------------------------------
+memex_queries.helpers.dd_sqlite module
+--------------------------------------
+Functions for interacting with the SQLite dump of Deep Dive data.
 
-.. automodule:: memex_queries.helpers.sqlite
+.. automodule:: memex_queries.helpers.dd_sqlite
     :members:
     :special-members:
     :private-members:
@@ -37,6 +70,8 @@ memex_queries.helpers.sqlite module
 
 Module contents
 ---------------
+Functions that interact with mulitple data stores. We try to prioritise the
+SQLite DB first, then HBase, then the CDR.
 
 .. automodule:: memex_queries.helpers
     :members:

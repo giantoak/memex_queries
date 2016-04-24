@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>memex_queries.go_images &mdash; memex_queries 0.0.0 documentation</title>
+  <title>memex_queries.go_images &mdash; memex_queries 0.0.1 documentation</title>
   
 
   
@@ -30,7 +30,7 @@
   
 
   
-    <link rel="top" title="memex_queries 0.0.0 documentation" href="../../index.html"/>
+    <link rel="top" title="memex_queries 0.0.1 documentation" href="../../index.html"/>
         <link rel="up" title="Module code" href="../index.html"/> 
 
   
@@ -128,10 +128,10 @@
             
   <h1>Source code for memex_queries.go_images</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">datetime</span> <span class="kn">as</span> <span class="nn">dt</span>
-<span class="kn">from</span> <span class="nn">helpers</span> <span class="kn">import</span> <span class="n">post_dates_for_general_cdr_image_id</span>
-<span class="kn">from</span> <span class="nn">helpers</span> <span class="kn">import</span> <span class="n">cdr_ad_ids_for_general_cdr_image_id</span>
+<span class="kn">from</span> <span class="nn">helpers</span> <span class="kn">import</span> <span class="n">post_dates_for_hashed_cdr_image_id</span>
+<span class="kn">from</span> <span class="nn">helpers</span> <span class="kn">import</span> <span class="n">cdr_ad_ids_for_hashed_cdr_image_id</span>
 <span class="kn">from</span> <span class="nn">helpers.cdr</span> <span class="kn">import</span> <span class="n">cdr_image_ids_for_cdr_ad_ids</span>
-<span class="kn">from</span> <span class="nn">helpers.sqlite</span> <span class="kn">import</span> <span class="n">df_of_tables_for_cdr_ad_ids</span>
+<span class="kn">from</span> <span class="nn">helpers.dd_sqlite</span> <span class="kn">import</span> <span class="n">df_of_tables_for_cdr_ad_ids</span>
 <span class="kn">from</span> <span class="nn">helpers</span> <span class="kn">import</span> <span class="n">df_of_tables_for_cdr_image_ids</span>
 <span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">chain</span>
 
@@ -300,7 +300,7 @@
 <span class="sd">    :param elasticsearch.Elasticsearch es:</span>
 <span class="sd">    :returns: `int` -- epochtime since the last posting</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">ad_timestamps</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">post_dates_for_general_cdr_image_id</span><span class="p">(</span><span class="n">cdr_image_id</span><span class="p">,</span> <span class="n">es</span><span class="p">))</span>
+    <span class="n">ad_timestamps</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">post_dates_for_hashed_cdr_image_id</span><span class="p">(</span><span class="n">cdr_image_id</span><span class="p">,</span> <span class="n">es</span><span class="p">))</span>
 
     <span class="k">if</span> <span class="n">epochtime</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
         <span class="c1"># If there&#39;s been no postings, the gap is infinite</span>
@@ -467,7 +467,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2016, Author.
+        &copy; Copyright 2016, Peter Landwehr.
 
     </p>
   </div>
@@ -489,7 +489,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../',
-            VERSION:'0.0.0',
+            VERSION:'0.0.1',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true

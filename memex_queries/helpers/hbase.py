@@ -31,7 +31,7 @@ def dd_id_for_cdr_ad_id(cdr_ad_id):
 def cdr_ad_id_for_dd_id(dd_id):
     """
     **THIS SECTION OF THE HBASE TABLE IS INCOMPLETE. DO NOT USE THIS /
-    FUNCTION YET.** Instead, reference the `dd_id_to_cdr_id` table in SQLite.
+    FUNCTION YET.** Instead, reference the ``dd_id_to_cdr_id`` table in SQLite.
 
     :param int dd_id: Deep Dive ID of an escort ad.
     :returns: `str` -- The CDR ID that maps to the Lattice / Deep Dive Dump Ad.
@@ -39,7 +39,7 @@ def cdr_ad_id_for_dd_id(dd_id):
     return hbase_row_value('deepdive_escort_ads', str(dd_id), 'info:cdr_id')
 
 
-def dd_id_df_for_cdr_ad_ids(cdr_ad_ids):
+def df_of_dd_ids_for_cdr_ad_ids(cdr_ad_ids):
     """
     :param list cdr_ad_ids: A list of CDR IDs of ads.
     :returns: `pandas.DataFrame` -- A two column DataFrame containing \

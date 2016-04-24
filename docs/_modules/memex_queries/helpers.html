@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>memex_queries.helpers &mdash; memex_queries 0.0.0 documentation</title>
+  <title>memex_queries.helpers &mdash; memex_queries 0.0.1 documentation</title>
   
 
   
@@ -30,7 +30,7 @@
   
 
   
-    <link rel="top" title="memex_queries 0.0.0 documentation" href="../../index.html"/>
+    <link rel="top" title="memex_queries 0.0.1 documentation" href="../../index.html"/>
         <link rel="up" title="Module code" href="../index.html"/> 
 
   
@@ -131,12 +131,12 @@
 <span class="kn">from</span> <span class="nn">.cdr</span> <span class="kn">import</span> <span class="n">cdr_fields_for_cdr_ids</span>
 <span class="kn">from</span> <span class="nn">.cdr</span> <span class="kn">import</span> <span class="n">cdr_image_ids_for_cdr_ad_ids</span>
 <span class="kn">from</span> <span class="nn">.hbase</span> <span class="kn">import</span> <span class="n">hbase_row_value</span>
-<span class="kn">from</span> <span class="nn">.sqlite</span> <span class="kn">import</span> <span class="n">df_of_tables_for_cdr_ad_ids</span>
-<span class="kn">from</span> <span class="nn">.sqlite</span> <span class="kn">import</span> <span class="n">df_of_tables_for_dd_ids</span>
+<span class="kn">from</span> <span class="nn">.dd_sqlite</span> <span class="kn">import</span> <span class="n">df_of_tables_for_cdr_ad_ids</span>
+<span class="kn">from</span> <span class="nn">.dd_sqlite</span> <span class="kn">import</span> <span class="n">df_of_tables_for_dd_ids</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
 
 
-<div class="viewcode-block" id="cdr_ad_ids_for_general_cdr_image_id"><a class="viewcode-back" href="../../memex_queries.helpers.html#memex_queries.helpers.cdr_ad_ids_for_general_cdr_image_id">[docs]</a><span class="k">def</span> <span class="nf">cdr_ad_ids_for_general_cdr_image_id</span><span class="p">(</span><span class="n">cdr_image_id</span><span class="p">,</span> <span class="n">es</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="cdr_ad_ids_for_hashed_cdr_image_id"><a class="viewcode-back" href="../../memex_queries.helpers.html#memex_queries.helpers.cdr_ad_ids_for_hashed_cdr_image_id">[docs]</a><span class="k">def</span> <span class="nf">cdr_ad_ids_for_hashed_cdr_image_id</span><span class="p">(</span><span class="n">cdr_image_id</span><span class="p">,</span> <span class="n">es</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param str cdr_image_id: The CDR ID of an image</span>
 <span class="sd">    :param elasticsearch.Elasticsearch es: CDR Connection (can be omitted)</span>
@@ -233,7 +233,7 @@
     <span class="c1"># ), on=[&#39;dd_id&#39;])</span>
 
 
-<div class="viewcode-block" id="post_dates_for_general_cdr_image_id"><a class="viewcode-back" href="../../memex_queries.helpers.html#memex_queries.helpers.post_dates_for_general_cdr_image_id">[docs]</a><span class="k">def</span> <span class="nf">post_dates_for_general_cdr_image_id</span><span class="p">(</span><span class="n">cdr_image_id</span><span class="p">,</span> <span class="n">es</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="post_dates_for_hashed_cdr_image_id"><a class="viewcode-back" href="../../memex_queries.helpers.html#memex_queries.helpers.post_dates_for_hashed_cdr_image_id">[docs]</a><span class="k">def</span> <span class="nf">post_dates_for_hashed_cdr_image_id</span><span class="p">(</span><span class="n">cdr_image_id</span><span class="p">,</span> <span class="n">es</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Given the ID of an image in the CDR, get all of the dates on which it \</span>
 <span class="sd">    was posted.</span>
@@ -243,7 +243,7 @@
 <span class="sd">    :returns: `pandas.DataFrame` -- DataFrame of CDR IDs, Deep Dive IDs, and \</span>
 <span class="sd">    Post Dates</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">post_dates_for_cdr_ad_ids</span><span class="p">(</span><span class="n">cdr_ad_ids_for_general_cdr_image_id</span><span class="p">(</span><span class="n">cdr_image_id</span><span class="p">,</span> <span class="n">es</span><span class="p">))</span></div>
+    <span class="k">return</span> <span class="n">post_dates_for_cdr_ad_ids</span><span class="p">(</span><span class="n">cdr_ad_ids_for_hashed_cdr_image_id</span><span class="p">(</span><span class="n">cdr_image_id</span><span class="p">,</span> <span class="n">es</span><span class="p">))</span></div>
 
 
 <div class="viewcode-block" id="cdr_image_ids_for_dd_ad_id"><a class="viewcode-back" href="../../memex_queries.helpers.html#memex_queries.helpers.cdr_image_ids_for_dd_ad_id">[docs]</a><span class="k">def</span> <span class="nf">cdr_image_ids_for_dd_ad_id</span><span class="p">(</span><span class="n">dd_ad_id</span><span class="p">):</span>
@@ -279,7 +279,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2016, Author.
+        &copy; Copyright 2016, Peter Landwehr.
 
     </p>
   </div>
@@ -301,7 +301,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../',
-            VERSION:'0.0.0',
+            VERSION:'0.0.1',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true

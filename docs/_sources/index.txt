@@ -16,7 +16,7 @@ on escort ad data.
 * The top-level ``memex_queries`` module provides a home for python functions
   written by the different teams that use the ``helpers`` to integrate multiple
   general queries for specific results. Essentially, they allow teams to share
-  their work.
+  their work by using a common pipeline.
 
 .. _HBase: https://hbase.apache.org/
 .. _Elasticsearch: https://www.elastic.co/products/elasticsearch

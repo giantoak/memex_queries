@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>memex_queries.helpers.hbase &mdash; memex_queries 0.0.0 documentation</title>
+  <title>memex_queries.helpers.hbase &mdash; memex_queries 0.0.1 documentation</title>
   
 
   
@@ -30,7 +30,7 @@
   
 
   
-    <link rel="top" title="memex_queries 0.0.0 documentation" href="../../../index.html"/>
+    <link rel="top" title="memex_queries 0.0.1 documentation" href="../../../index.html"/>
         <link rel="up" title="memex_queries.helpers" href="../helpers.html"/> 
 
   
@@ -162,7 +162,7 @@
 <div class="viewcode-block" id="cdr_ad_id_for_dd_id"><a class="viewcode-back" href="../../../memex_queries.helpers.html#memex_queries.helpers.hbase.cdr_ad_id_for_dd_id">[docs]</a><span class="k">def</span> <span class="nf">cdr_ad_id_for_dd_id</span><span class="p">(</span><span class="n">dd_id</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    **THIS SECTION OF THE HBASE TABLE IS INCOMPLETE. DO NOT USE THIS /</span>
-<span class="sd">    FUNCTION YET.** Instead, reference the `dd_id_to_cdr_id` table in SQLite.</span>
+<span class="sd">    FUNCTION YET.** Instead, reference the ``dd_id_to_cdr_id`` table in SQLite.</span>
 
 <span class="sd">    :param int dd_id: Deep Dive ID of an escort ad.</span>
 <span class="sd">    :returns: `str` -- The CDR ID that maps to the Lattice / Deep Dive Dump Ad.</span>
@@ -170,7 +170,7 @@
     <span class="k">return</span> <span class="n">hbase_row_value</span><span class="p">(</span><span class="s1">&#39;deepdive_escort_ads&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">dd_id</span><span class="p">),</span> <span class="s1">&#39;info:cdr_id&#39;</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="dd_id_df_for_cdr_ad_ids"><a class="viewcode-back" href="../../../memex_queries.helpers.html#memex_queries.helpers.hbase.dd_id_df_for_cdr_ad_ids">[docs]</a><span class="k">def</span> <span class="nf">dd_id_df_for_cdr_ad_ids</span><span class="p">(</span><span class="n">cdr_ad_ids</span><span class="p">):</span>
+<div class="viewcode-block" id="df_of_dd_ids_for_cdr_ad_ids"><a class="viewcode-back" href="../../../memex_queries.helpers.html#memex_queries.helpers.hbase.df_of_dd_ids_for_cdr_ad_ids">[docs]</a><span class="k">def</span> <span class="nf">df_of_dd_ids_for_cdr_ad_ids</span><span class="p">(</span><span class="n">cdr_ad_ids</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param list cdr_ad_ids: A list of CDR IDs of ads.</span>
 <span class="sd">    :returns: `pandas.DataFrame` -- A two column DataFrame containing \</span>
@@ -193,7 +193,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2016, Author.
+        &copy; Copyright 2016, Peter Landwehr.
 
     </p>
   </div>
@@ -215,7 +215,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../../',
-            VERSION:'0.0.0',
+            VERSION:'0.0.1',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true

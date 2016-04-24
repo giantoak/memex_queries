@@ -1,8 +1,8 @@
 import datetime as dt
-from helpers import post_dates_for_general_cdr_image_id
-from helpers import cdr_ad_ids_for_general_cdr_image_id
+from helpers import post_dates_for_hashed_cdr_image_id
+from helpers import cdr_ad_ids_for_hashed_cdr_image_id
 from helpers.cdr import cdr_image_ids_for_cdr_ad_ids
-from helpers.sqlite import df_of_tables_for_cdr_ad_ids
+from helpers.dd_sqlite import df_of_tables_for_cdr_ad_ids
 from helpers import df_of_tables_for_cdr_image_ids
 from itertools import chain
 
@@ -171,7 +171,7 @@ def query_eleven(cdr_image_id, epochtime=None, es=None):
     :param elasticsearch.Elasticsearch es:
     :returns: `int` -- epochtime since the last posting
     """
-    ad_timestamps = sorted(post_dates_for_general_cdr_image_id(cdr_image_id, es))
+    ad_timestamps = sorted(post_dates_for_hashed_cdr_image_id(cdr_image_id, es))
 
     if epochtime is None:
         # If there's been no postings, the gap is infinite

@@ -2,12 +2,12 @@ from .cdr import cdr_ad_ids_for_cdr_image_ids
 from .cdr import cdr_fields_for_cdr_ids
 from .cdr import cdr_image_ids_for_cdr_ad_ids
 from .hbase import hbase_row_value
-from .sqlite import df_of_tables_for_cdr_ad_ids
-from .sqlite import df_of_tables_for_dd_ids
+from .dd_sqlite import df_of_tables_for_cdr_ad_ids
+from .dd_sqlite import df_of_tables_for_dd_ids
 import pandas as pd
 
 
-def cdr_ad_ids_for_general_cdr_image_id(cdr_image_id, es=None):
+def cdr_ad_ids_for_hashed_cdr_image_id(cdr_image_id, es=None):
     """
     :param str cdr_image_id: The CDR ID of an image
     :param elasticsearch.Elasticsearch es: CDR Connection (can be omitted)
@@ -104,7 +104,7 @@ def post_dates_for_cdr_ad_ids(cdr_ad_ids):
     # ), on=['dd_id'])
 
 
-def post_dates_for_general_cdr_image_id(cdr_image_id, es=None):
+def post_dates_for_hashed_cdr_image_id(cdr_image_id, es=None):
     """
     Given the ID of an image in the CDR, get all of the dates on which it \
     was posted.
@@ -114,7 +114,7 @@ def post_dates_for_general_cdr_image_id(cdr_image_id, es=None):
     :returns: `pandas.DataFrame` -- DataFrame of CDR IDs, Deep Dive IDs, and \
     Post Dates
     """
-    return post_dates_for_cdr_ad_ids(cdr_ad_ids_for_general_cdr_image_id(cdr_image_id, es))
+    return post_dates_for_cdr_ad_ids(cdr_ad_ids_for_hashed_cdr_image_id(cdr_image_id, es))
 
 
 def cdr_image_ids_for_dd_ad_id(dd_ad_id):

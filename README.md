@@ -37,17 +37,30 @@ be used for answering questions related to specific fields or collections of fie
 Lower-level helper functions that can be used as components of high-level
 queries. These should facilitate hitting particular MEMEX resources.
 DeepDive data is currently stored locally, within a [SQLite] database.
-Functions should  *generally* be named  `X_for_Y` or `X_from_Y`, where `X` is
-a reasonable approximation of the output data structure and `Y` is a
-reasonable approximation of the input data structure.
+Functions should  *generally* be named  along the lines of:
+
+* `B_of_A_for_Y_of_X`
+* `B_of_A_from_Y_of_X`
+* `A_B_for_X_Y`
+* `A_B_from_X_Y`
+
+where:
+
+* `B` is the data structure holding the output
+* `A` is a reasonable shorthand for the desired output content.
+* `Y` is a reasonable shorthand for the input data structure
+* `X` is a reasonable shorthand for the output data structure.
+
+`B` and `Y` may be omitted.
+
 ```
 > # Sample high-level query using low-level components:
 > def memex_query_three(image_cdr_id):
->   from helpers.elasticsearch import get_data_from_cdr
->   from helpers.hbase import det_data_from_hbase
+>   from helpers.cdr import cdr_ad_ids_for_cdr_image_ids
+>   from helpers.hbase import df_of_dd_ids_for_cdr_ad_ids
 >
->   related_ads = data_from_cdr(image_cdr_id)
->   data_related_to_ads = data_fom_Hbase('some_table', related_ads, 'ad:field')
+>   cdr_ad_ids = cdr_ad_ids_for_cdr_image_ids(cdr_image_ids)
+>   df = df_of_dd_ids_for_cdr_ad_ids(cdr_ad_ids)
 >   return list(data_related_to_ads)
 ```
 
@@ -113,13 +126,14 @@ Term | Meaning
 :--- |:---
 CDR Ad ID | The `_id` of an advertisement in the CDR.
 CDR Image ID | The `_id` of an image in the CDR. Each image has an ad as its parent
-General CDR Image ID | A notional `_id`; the set of all CDR Image IDs for images that are functionally 
-identical. At present, this means a SHA hash, but it could also be ascribed to other similarity services.
+Hashed CDR Image ID | A notional `_id`; the set of all CDR Image IDs for images that hash to the same value.
+Clustered CDR Image ID | A notional `_id`; the set of all CDR Image IDs for images that have been clustered together. 
+This could be because of an identical hash, or because they score highly on some other metric.
 DD ID | The ID of an advertisement in the most recent dump of the Deep Dive Data, a.k.a Lattice Data, a.ka. Stanford Data.
 
 # Future Plans
 
-This is v.0.0 of this product, and was initially developed to facilitate
+This is v.0.0.1 of this product, and was initially developed to facilitate
 image comparisons by Giant Oak. *Future* versions of this library should put
 the general problem of connecting data sources first. That would hopefully limit some amount of growth
 in the number of generic functions being created.
