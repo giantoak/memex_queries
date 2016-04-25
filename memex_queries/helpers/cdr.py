@@ -78,7 +78,8 @@ def cdr_ad_ids_for_cdr_image_ids(cdr_image_ids, es=None):
     :returns: `list` -- List of CDR IDs of ads using these images
     """
     data_dict = cdr_fields_for_cdr_ids(cdr_image_ids, 'obj_parent', es)
-    return [data_dict[x]['obj_parent'] for x in cdr_image_ids]
+    return [data_dict[x]['obj_parent']if 'obj_parent' in data_dict[x] else None
+            for x in cdr_image_ids]
 
 
 def cdr_image_ids_for_cdr_ad_ids(cdr_ad_ids, es=None):

@@ -49,7 +49,7 @@ def df_of_tables_for_dd_ids(dd_ids, sqlite_tables, sql_con=None):
 
 def df_of_tables_for_cdr_ad_ids(cdr_ad_ids, sqlite_tables, sql_con=None):
     """
-    :param list cdr_ad_ids: list of CDR Ad IDs to match with deep dive data
+    :param unicode|str|list cdr_ad_ids: list of CDR Ad IDs to match with deep dive data
     :param list sqlite_tables: list of SQLite tables to join
     :param sqlalchemy.create_engine sql_con: Connection to SQLite (can be \
     omitted)
@@ -57,6 +57,9 @@ def df_of_tables_for_cdr_ad_ids(cdr_ad_ids, sqlite_tables, sql_con=None):
     Dive IDs.
     """
     from pandas import read_sql
+
+    if isinstance(cdr_ad_ids, (str, unicode)):
+        cdr_ad_ids = [cdr_ad_ids]
 
     cdr_ids_str = ','.join(['"{}"'.format(cdr_id) for cdr_id in cdr_ad_ids])
 

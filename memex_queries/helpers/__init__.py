@@ -106,15 +106,18 @@ def post_dates_for_cdr_ad_ids(cdr_ad_ids):
 
 def post_dates_for_hashed_cdr_image_id(cdr_image_id, es=None):
     """
-    Given the ID of an image in the CDR, get all of the dates on which it \
-    was posted.
+    Given the ID of an image in the CDR, hash it, and get all of the dates \
+    on which it was posted.
 
     :param str cdr_image_id: An image's CDR ID
     :param elasticsearch.Elasticsearch es: CDR Connection (can be omitted)
     :returns: `pandas.DataFrame` -- DataFrame of CDR IDs, Deep Dive IDs, and \
     Post Dates
     """
-    return post_dates_for_cdr_ad_ids(cdr_ad_ids_for_hashed_cdr_image_id(cdr_image_id, es))
+    cdr_ad_ids = cdr_ad_ids_for_hashed_cdr_image_id(cdr_image_id, es)
+    if isinstance(cdr_ad_ids, (str, unicode)):
+        cdr_ad_ids = [cdr_ad_ids]
+    return post_dates_for_cdr_ad_ids(cdr_ad_ids)
 
 
 def cdr_image_ids_for_dd_ad_id(dd_ad_id):
