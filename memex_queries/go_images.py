@@ -13,10 +13,10 @@ def query_one(cdr_image_id):
     date that it was posted in an ad.
 
     :param str cdr_image_id: The CDR ID of the image to retrieve
-    :param elasticsearch.Elasticsearch es: the elasticsearch index to search
-    :returns: `datetime.datetime` --
+    :param elasticsearch.Elasticsearch es: An elasticsearch connection
+    :returns: `pandas.tslib.Timestamp` --
     """
-    return min(post_dates_for_general_cdr_image_id(cdr_image_id))
+    return min(post_dates_for_hashed_cdr_image_id(cdr_image_id).post_date)
 
 
 def query_two(cdr_image_id):
@@ -28,7 +28,7 @@ def query_two(cdr_image_id):
     :param str cdr_image_id: The CDR ID of the image to retrieve
     :returns: `set` --
     """
-    cdr_ad_ids = cdr_ad_ids_for_general_cdr_image_id(cdr_image_id)
+    cdr_ad_ids = cdr_ad_ids_for_hashed_cdr_image_id(cdr_image_id)
     df = df_of_tables_for_cdr_ad_ids(cdr_ad_ids, ['dd_id_to_phone', 'dd_id_to_post_date'])
     first_date = df.post_date.min()
 
@@ -44,7 +44,7 @@ def query_three(cdr_image_id, post_date):
     :param str|datetime.datetime post_date: Date against which to check
     :returns: `set` --
     """
-    cdr_ad_ids = cdr_ad_ids_for_general_cdr_image_id(cdr_image_id)
+    cdr_ad_ids = cdr_ad_ids_for_hashed_cdr_image_id(cdr_image_id)
     df = df_of_tables_for_cdr_ad_ids(cdr_ad_ids, ['dd_id_to_phone', 'dd_id_to_post_date'])
 
     if isinstance(post_date, str):
@@ -73,7 +73,7 @@ def query_five(cdr_image_id):
     :param str cdr_image_id: The CDR ID of the image to retrieve
     :returns: `set` --
     """
-    cdr_ad_ids = cdr_ad_ids_for_general_cdr_image_id(cdr_image_id)
+    cdr_ad_ids = cdr_ad_ids_for_hashed_cdr_image_id(cdr_image_id)
     df = df_of_tables_for_cdr_ad_ids(cdr_ad_ids, ['dd_id_to_phone'])
     return set(df.phone)
 
@@ -100,7 +100,7 @@ def query_seven(cdr_image_id, post_date, phone_number=None):
 
     :return:
     """
-    cdr_ad_ids = cdr_ad_ids_for_general_cdr_image_id(cdr_image_id)
+    cdr_ad_ids = cdr_ad_ids_for_hashed_cdr_image_id(cdr_image_id)
     df = df_of_tables_for_cdr_ad_ids(cdr_ad_ids, ['dd_id_to_phone', 'dd_id_to_post_date'])
 
     if isinstance(post_date, str):
@@ -138,7 +138,7 @@ def query_nine(cdr_ad_id, phone_number=None):
     """
     cdr_image_ids = cdr_image_ids_for_cdr_ad_ids([cdr_ad_id])[cdr_ad_id]
 
-    cdr_ad_ids = list(set(chain(*[cdr_ad_ids_for_general_cdr_image_id(cdr_image_id)
+    cdr_ad_ids = list(set(chain(*[cdr_ad_ids_for_hashed_cdr_image_id(cdr_image_id)
                                   for cdr_image_id in cdr_image_ids])
                           ))
     df = df_of_tables_for_cdr_ad_ids(cdr_ad_ids, ['dd_id_to_phone', 'dd_id_to_post_date'])
