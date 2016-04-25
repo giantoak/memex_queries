@@ -47,7 +47,7 @@ def query_three(cdr_image_id, post_date):
     cdr_ad_ids = cdr_ad_ids_for_hashed_cdr_image_id(cdr_image_id)
     df = df_of_tables_for_cdr_ad_ids(cdr_ad_ids, ['dd_id_to_phone', 'dd_id_to_post_date'])
 
-    if isinstance(post_date, str):
+    if isinstance(post_date, (str, unicode)):
         from pandas import to_datetime
         post_date = to_datetime(post_date)
 
@@ -103,7 +103,7 @@ def query_seven(cdr_image_id, post_date, phone_number=None):
     cdr_ad_ids = cdr_ad_ids_for_hashed_cdr_image_id(cdr_image_id)
     df = df_of_tables_for_cdr_ad_ids(cdr_ad_ids, ['dd_id_to_phone', 'dd_id_to_post_date'])
 
-    if isinstance(post_date, str):
+    if isinstance(post_date, (str, unicode)):
         post_date = dt.datetime(post_date)
 
     if phone_number is None:
