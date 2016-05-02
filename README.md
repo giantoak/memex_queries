@@ -91,16 +91,7 @@ Functions for interacting with resources provided by Uncharted.
 
 #### [`memex_queries/helpers/__init__.py`](https://github.com/giantoak/memex_queries/blob/master/memex_queries/helpers/__init__.py)
 Functions that interact with multiple data stores provided by different teams.
-
-## Setup stuff
-### [`make_dd_sqlite_db.sql`](https://github.com/giantoak/memex_queries/blob/master/make_dd_sqlite_db.sql)
-Load the Deep Dive dump into SQLite.
-### [`get_dd_data_load_sb.sh`](https://github.com/giantoak/memex_queries/blob/master/get_dd_data_load_db.sh)
-Download the Deep Dive dump and call `make_dd_sqlite_db.sql` to ingest it; see
-[here](https://memexproxy.com/wiki/display/MPM/How+To+Get+Stanford+Memex+S3+Data)
-for information about configuring your S3 access.
-
-
+`
 # Writing Queries
 TSV files and CSV files are the bread-and-butter of data science. [Pandas] and
 [blaze] are the bread-and-butter of data science in Python, and can be used to
@@ -112,7 +103,6 @@ should be written with the expectation  that they either:
 * Take a single row of data and…
   * return a `pandas.DataFrame`, `pandas.Series`, or appropriate `blaze` object.
   * return a single row of data.
-
 
 ## "I don't like SQL and want to stay clear of it."
 The easiest way to do this is create a `DataFrame` by selecting all of the
@@ -140,7 +130,7 @@ Term | Meaning
 CDR Ad ID | The `_id` of an advertisement in the CDR.
 CDR Image ID | The `_id` of an image in the CDR. Each image has an ad as its parent
 Hashed CDR Image ID | A notional `_id`; the set of all CDR Image IDs for images that hash to the same value.
-Clustered CDR Image ID | A notional `_id`; the set of all CDR Image IDs for images that have been clustered together. 
+Clustered CDR Image ID | A notional `_id`; the set of all CDR Image IDs for images that have been clustered together.
 This could be because of an identical hash, or because they score highly on some other metric.
 DD ID | The ID of an advertisement in the most recent dump of the Deep Dive Data, a.k.a Lattice Data, a.ka. Stanford Data.
 
