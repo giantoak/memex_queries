@@ -2,7 +2,8 @@ memex_queries.helpers package
 =============================
 These are lower-level helper functions that can be used as components of high-level
 queries; they should hit MEMEX resources directly.
-The Deep Dive data is currently stored locally, within a [SQLite] database.
+The Deep Dive data is currently stored locally, within a [SQLite] database, and not
+in a remote resource.
 Functions should  *generally* be named  along the lines of:
 
 * ``B_of_A_for_Y_of_X``
@@ -31,42 +32,22 @@ where:
    >   df = df_of_dd_ids_for_cdr_ad_ids(cdr_ad_ids)
    >   return list(data_related_to_ads)
 
+
+Subpackages
+-----------
+Each subpackage contains functions for accessing the data stores provided by
+different MEMEX teams.
+
+.. toctree::
+
+    memex_queries.helpers.giantoak
+    memex_queries.helpers.isi
+    memex_queries.helpers.ist
+    memex_queries.helpers.jpl
+    memex_queries.helpers.lattice
+
 Submodules
 ----------
-
-memex_queries.helpers.cdr module
---------------------------------
-Functions for interacting with the CDR.
-
-.. automodule:: memex_queries.helpers.cdr
-    :members:
-    :special-members:
-    :private-members:
-    :undoc-members:
-    :show-inheritance:
-
-memex_queries.helpers.hbase module
-----------------------------------
-Functions for interacting with the MEMEX HBase.
-
-.. automodule:: memex_queries.helpers.hbase
-    :members:
-    :special-members:
-    :private-members:
-    :undoc-members:
-    :show-inheritance:
-
-memex_queries.helpers.dd_sqlite module
---------------------------------------
-Functions for interacting with the SQLite dump of Deep Dive data.
-
-.. automodule:: memex_queries.helpers.dd_sqlite
-    :members:
-    :special-members:
-    :private-members:
-    :undoc-members:
-    :show-inheritance:
-
 
 Module contents
 ---------------

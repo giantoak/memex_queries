@@ -1,0 +1,28 @@
+memex_queries.helpers.ist package
+=================================
+Functions for interacting with data curated by IST
+
+Submodules
+----------
+
+memex_queries.helpers.ist.cdr module
+------------------------------------
+Functions for interacting with the CDR, the central Elasticsearch database.
+
+.. automodule:: memex_queries.helpers.ist.cdr
+    :members:
+    :special-members:
+    :private-members:
+    :undoc-members:
+    :show-inheritance:
+
+Module contents
+---------------
+Functions that interact with multiple IST data stores
+
+.. automodule:: memex_queries.helpers.ist
+    :members:
+    :special-members:
+    :private-members:
+    :undoc-members:
+    :show-inheritance:

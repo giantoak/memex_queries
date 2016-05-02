@@ -13,6 +13,7 @@ Submodules
 
 memex_queries.go_images module
 ------------------------------
+Various queries for relational image data written by Giant Oak.
 
 .. automodule:: memex_queries.go_images
     :members:

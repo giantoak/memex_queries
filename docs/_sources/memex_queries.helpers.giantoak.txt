@@ -1,0 +1,18 @@
+memex_queries.helpers.giantoak package
+======================================
+Functions for interacting with data curated by Giant Oak. (Currently none.)
+
+Submodules
+----------
+
+
+Module contents
+---------------
+Functions that interact with multiple Giant Oak data stores.
+
+.. automodule:: memex_queries.helpers.giantoak
+    :members:
+    :special-members:
+    :private-members:
+    :undoc-members:
+    :show-inheritance:

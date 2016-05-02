@@ -22,7 +22,7 @@ def _hbase_row_value(table, row_id, key_id):
 
 def image_hash_for_cdr_image_id(cdr_image_id):
     """
-    :param cdr_image_id:
+    :param cdr_image_id: CDR ID of an image
     :returns: `str` -- SHA1 Hash of image or None, if not in HBase
     """
     cdr_id_to_sha_tables = ['ht_images_cdrid_to_sha1_2016',

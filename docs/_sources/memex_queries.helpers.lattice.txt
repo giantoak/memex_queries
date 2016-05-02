@@ -1,0 +1,28 @@
+memex_queries.helpers.lattice package
+=====================================
+Functions for interacting with data curated by the Lattice and Stanford teams.
+
+Submodules
+----------
+
+memex_queries.helpers.lattice.sqlite module
+-------------------------------------------
+Functions for interacting with Giant Oak's SQLite dump of Lattice's data.
+
+.. automodule:: memex_queries.helpers.lattice.sqlite
+    :members:
+    :special-members:
+    :private-members:
+    :undoc-members:
+    :show-inheritance:
+
+Module contents
+---------------
+Functions that interact with multiple Lattice data stores
+
+.. automodule:: memex_queries.helpers.lattice
+    :members:
+    :special-members:
+    :private-members:
+    :undoc-members:
+    :show-inheritance:

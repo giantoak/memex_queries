@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>memex_queries.helpers.cdr &mdash; memex_queries 0.0.1 documentation</title>
+  <title>memex_queries.helpers.ist.cdr &mdash; memex_queries 0.0.1 documentation</title>
   
 
   
@@ -24,17 +24,17 @@
 
   
   
-    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
   
 
   
 
   
-    <link rel="top" title="memex_queries 0.0.1 documentation" href="../../../index.html"/>
-        <link rel="up" title="memex_queries.helpers" href="../helpers.html"/> 
+    <link rel="top" title="memex_queries 0.0.1 documentation" href="../../../../index.html"/>
+        <link rel="up" title="memex_queries.helpers" href="../../helpers.html"/> 
 
   
-  <script src="../../../_static/js/modernizr.min.js"></script>
+  <script src="../../../../_static/js/modernizr.min.js"></script>
 
 </head>
 
@@ -49,7 +49,7 @@
           
 
           
-            <a href="../../../index.html" class="icon icon-home"> memex_queries
+            <a href="../../../../index.html" class="icon icon-home"> memex_queries
           
 
           
@@ -66,7 +66,7 @@
 
           
 <div role="search">
-  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
@@ -81,7 +81,7 @@
             
             
                 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../memex_queries.html">memex_queries package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../memex_queries.html">memex_queries package</a></li>
 </ul>
 
             
@@ -95,7 +95,7 @@
       
       <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
         <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href="../../../index.html">memex_queries</a>
+        <a href="../../../../index.html">memex_queries</a>
       </nav>
 
 
@@ -110,13 +110,13 @@
 
 <div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
-    <li><a href="../../../index.html">Docs</a> &raquo;</li>
+    <li><a href="../../../../index.html">Docs</a> &raquo;</li>
       
-          <li><a href="../../index.html">Module code</a> &raquo;</li>
+          <li><a href="../../../index.html">Module code</a> &raquo;</li>
       
-          <li><a href="../helpers.html">memex_queries.helpers</a> &raquo;</li>
+          <li><a href="../../helpers.html">memex_queries.helpers</a> &raquo;</li>
       
-    <li>memex_queries.helpers.cdr</li>
+    <li>memex_queries.helpers.ist.cdr</li>
       <li class="wy-breadcrumbs-aside">
         
           
@@ -128,7 +128,7 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <h1>Source code for memex_queries.helpers.cdr</h1><div class="highlight"><pre>
+  <h1>Source code for memex_queries.helpers.ist.cdr</h1><div class="highlight"><pre>
 <span></span><span class="n">CDR_URL</span> <span class="o">=</span> <span class="s1">&#39;els.istresearch.com:19200/memex-domains&#39;</span>
 <span class="n">CDR_INDEX</span> <span class="o">=</span> <span class="s1">&#39;escorts&#39;</span>
 <span class="n">CDR_AUTH_TUPLE</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;memex&#39;</span><span class="p">,</span> <span class="s1">&#39;qRJfu2uPkMLmH9cp&#39;</span><span class="p">)</span>
@@ -140,7 +140,7 @@
 <span class="n">local_es</span> <span class="o">=</span> <span class="bp">None</span>
 
 
-<div class="viewcode-block" id="_filter_terms_query"><a class="viewcode-back" href="../../../memex_queries.helpers.html#memex_queries.helpers.cdr._filter_terms_query">[docs]</a><span class="k">def</span> <span class="nf">_filter_terms_query</span><span class="p">(</span><span class="n">query_dict</span><span class="p">):</span>
+<div class="viewcode-block" id="_filter_terms_query"><a class="viewcode-back" href="../../../../memex_queries.helpers.ist.html#memex_queries.helpers.ist.cdr._filter_terms_query">[docs]</a><span class="k">def</span> <span class="nf">_filter_terms_query</span><span class="p">(</span><span class="n">query_dict</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param dict query_dict: Dict of CDR terms/fields to filter on and their assigned values</span>
 <span class="sd">    :returns: `dict` -- The query_dict, wrapped in Elastic &quot;filter: terms&quot; JSON</span>
@@ -152,7 +152,7 @@
     <span class="p">}</span></div>
 
 
-<div class="viewcode-block" id="_new_elasticsearch"><a class="viewcode-back" href="../../../memex_queries.helpers.html#memex_queries.helpers.cdr._new_elasticsearch">[docs]</a><span class="k">def</span> <span class="nf">_new_elasticsearch</span><span class="p">():</span>
+<div class="viewcode-block" id="_new_elasticsearch"><a class="viewcode-back" href="../../../../memex_queries.helpers.ist.html#memex_queries.helpers.ist.cdr._new_elasticsearch">[docs]</a><span class="k">def</span> <span class="nf">_new_elasticsearch</span><span class="p">():</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :returns: `elasticsearch.Elasticsearch` -- An active connection to the CDR</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -164,7 +164,7 @@
     <span class="k">return</span> <span class="n">local_es</span></div>
 
 
-<div class="viewcode-block" id="cdr_fields_for_cdr_ids"><a class="viewcode-back" href="../../../memex_queries.helpers.html#memex_queries.helpers.cdr.cdr_fields_for_cdr_ids">[docs]</a><span class="k">def</span> <span class="nf">cdr_fields_for_cdr_ids</span><span class="p">(</span><span class="n">cdr_ids</span><span class="p">,</span> <span class="n">fields</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">es</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="cdr_fields_for_cdr_ids"><a class="viewcode-back" href="../../../../memex_queries.helpers.ist.html#memex_queries.helpers.ist.cdr.cdr_fields_for_cdr_ids">[docs]</a><span class="k">def</span> <span class="nf">cdr_fields_for_cdr_ids</span><span class="p">(</span><span class="n">cdr_ids</span><span class="p">,</span> <span class="n">fields</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">es</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param list|str cdr_ids: Single CDR ID or a list of CDR IDs</span>
 <span class="sd">    :param list|str fields: List of desired fields. If None, returns all \</span>
@@ -201,7 +201,7 @@
     <span class="k">return</span> <span class="n">out_dict</span></div>
 
 
-<div class="viewcode-block" id="cdr_ad_ids_for_cdr_image_ids"><a class="viewcode-back" href="../../../memex_queries.helpers.html#memex_queries.helpers.cdr.cdr_ad_ids_for_cdr_image_ids">[docs]</a><span class="k">def</span> <span class="nf">cdr_ad_ids_for_cdr_image_ids</span><span class="p">(</span><span class="n">cdr_image_ids</span><span class="p">,</span> <span class="n">es</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="cdr_ad_ids_for_cdr_image_ids"><a class="viewcode-back" href="../../../../memex_queries.helpers.ist.html#memex_queries.helpers.ist.cdr.cdr_ad_ids_for_cdr_image_ids">[docs]</a><span class="k">def</span> <span class="nf">cdr_ad_ids_for_cdr_image_ids</span><span class="p">(</span><span class="n">cdr_image_ids</span><span class="p">,</span> <span class="n">es</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param list cdr_image_ids: Single CDR ID of an image or a list of \</span>
 <span class="sd">    CDR IDs of images.</span>
@@ -209,10 +209,11 @@
 <span class="sd">    :returns: `list` -- List of CDR IDs of ads using these images</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">data_dict</span> <span class="o">=</span> <span class="n">cdr_fields_for_cdr_ids</span><span class="p">(</span><span class="n">cdr_image_ids</span><span class="p">,</span> <span class="s1">&#39;obj_parent&#39;</span><span class="p">,</span> <span class="n">es</span><span class="p">)</span>
-    <span class="k">return</span> <span class="p">[</span><span class="n">data_dict</span><span class="p">[</span><span class="n">x</span><span class="p">][</span><span class="s1">&#39;obj_parent&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">cdr_image_ids</span><span class="p">]</span></div>
+    <span class="k">return</span> <span class="p">[</span><span class="n">data_dict</span><span class="p">[</span><span class="n">x</span><span class="p">][</span><span class="s1">&#39;obj_parent&#39;</span><span class="p">]</span><span class="k">if</span> <span class="s1">&#39;obj_parent&#39;</span> <span class="ow">in</span> <span class="n">data_dict</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="k">else</span> <span class="bp">None</span>
+            <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">cdr_image_ids</span><span class="p">]</span></div>
 
 
-<div class="viewcode-block" id="cdr_image_ids_for_cdr_ad_ids"><a class="viewcode-back" href="../../../memex_queries.helpers.html#memex_queries.helpers.cdr.cdr_image_ids_for_cdr_ad_ids">[docs]</a><span class="k">def</span> <span class="nf">cdr_image_ids_for_cdr_ad_ids</span><span class="p">(</span><span class="n">cdr_ad_ids</span><span class="p">,</span> <span class="n">es</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="cdr_image_ids_for_cdr_ad_ids"><a class="viewcode-back" href="../../../../memex_queries.helpers.ist.html#memex_queries.helpers.ist.cdr.cdr_image_ids_for_cdr_ad_ids">[docs]</a><span class="k">def</span> <span class="nf">cdr_image_ids_for_cdr_ad_ids</span><span class="p">(</span><span class="n">cdr_ad_ids</span><span class="p">,</span> <span class="n">es</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param list|str cdr_ad_ids: Single CDR ID of an ad or a list of CDR IDs \</span>
 <span class="sd">    of ads.</span>
@@ -237,7 +238,7 @@
     <span class="k">return</span> <span class="n">res_dict</span></div>
 
 
-<div class="viewcode-block" id="stored_url_of_cdr_image_id"><a class="viewcode-back" href="../../../memex_queries.helpers.html#memex_queries.helpers.cdr.stored_url_of_cdr_image_id">[docs]</a><span class="k">def</span> <span class="nf">stored_url_of_cdr_image_id</span><span class="p">(</span><span class="n">cdr_image_id</span><span class="p">,</span> <span class="n">es</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="stored_url_of_cdr_image_id"><a class="viewcode-back" href="../../../../memex_queries.helpers.ist.html#memex_queries.helpers.ist.cdr.stored_url_of_cdr_image_id">[docs]</a><span class="k">def</span> <span class="nf">stored_url_of_cdr_image_id</span><span class="p">(</span><span class="n">cdr_image_id</span><span class="p">,</span> <span class="n">es</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param str cdr_image_id: CDR ID of an image</span>
 <span class="sd">    :param elasticsearch.Elasticsearch es: CDR Connection (can be omitted)</span>
@@ -277,22 +278,22 @@
 
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../../../',
+            URL_ROOT:'../../../../',
             VERSION:'0.0.1',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true
         };
     </script>
-      <script type="text/javascript" src="../../../_static/jquery.js"></script>
-      <script type="text/javascript" src="../../../_static/underscore.js"></script>
-      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+      <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../../_static/doctools.js"></script>
 
   
 
   
   
-    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+    <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
   
 
   

@@ -1,0 +1,28 @@
+memex_queries.helpers.isi package
+=================================
+Functions for interacting with data curated by Columbia and ISI.
+
+Submodules
+----------
+
+memex_queries.helpers.isi.cdr module
+------------------------------------
+Functions for interacting with ISI's HBase tables
+
+.. automodule:: memex_queries.helpers.isi.hbase
+    :members:
+    :special-members:
+    :private-members:
+    :undoc-members:
+    :show-inheritance:
+
+Module contents
+---------------
+Functions that interact with multiple ISI data stores
+
+.. automodule:: memex_queries.helpers.isi
+    :members:
+    :special-members:
+    :private-members:
+    :undoc-members:
+    :show-inheritance:
