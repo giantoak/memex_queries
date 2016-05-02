@@ -1,8 +1,8 @@
-SQLITE_FILE = 'dd_dump.db'
+SQLITE_FILE = 'dd_dump_v2.db'
 local_sqlite = None
 
 
-def new_sqlite_con():
+def _new_sqlite_con():
     """
     :returns: `sqlalchemy.create_engine` -- Connection to the SQLite database.
     """
@@ -15,7 +15,7 @@ def new_sqlite_con():
     return local_sqlite
 
 
-def df_of_tables_for_dd_ids(dd_ids, sqlite_tables, sql_con=None):
+def _df_of_tables_for_dd_ids(dd_ids, sqlite_tables, sql_con=None):
     """
     :param list dd_ids: list of Deep Dive IDs to retrieve
     :param list sqlite_tables: list of SQLite tables to join
@@ -30,7 +30,7 @@ def df_of_tables_for_dd_ids(dd_ids, sqlite_tables, sql_con=None):
     query_fmt = 'select * from {} where dd_id in ({})'.format
 
     if sql_con is None:
-        sql_con = new_sqlite_con()
+        sql_con = _new_sqlite_con()
 
     df = read_sql(query_fmt(sqlite_tables[0], dd_ids_str), sql_con)
     df['dd_id'] = df.dd_id.astype(int)
@@ -45,6 +45,17 @@ def df_of_tables_for_dd_ids(dd_ids, sqlite_tables, sql_con=None):
         df['post_date'] = df.post_date.apply(to_datetime)
 
     return df
+
+
+def _df_of_phones_for_dd_ids(dd_ids, sql_con=None):
+    """
+    :param list dd_ids: List of Deep Dive IDs
+    :param sqlalchemy.create_engine sql_con: Connection to SQLite (can be \
+    omitted)
+    :returns: `pandas.DataFrame` -- Data Frame of Deep Dive IDs and the phone \
+    numbers assigned to them.
+    """
+    return _df_of_tables_for_dd_ids(dd_ids, ['dd_id_to_phone'], sql_con)
 
 
 def df_of_tables_for_cdr_ad_ids(cdr_ad_ids, sqlite_tables, sql_con=None):
@@ -64,20 +75,10 @@ def df_of_tables_for_cdr_ad_ids(cdr_ad_ids, sqlite_tables, sql_con=None):
     cdr_ids_str = ','.join(['"{}"'.format(cdr_id) for cdr_id in cdr_ad_ids])
 
     if sql_con is None:
-        sql_con = new_sqlite_con()
+        sql_con = _new_sqlite_con()
 
     df = read_sql('select * from dd_id_to_cdr_id where cdr_id in ({})'.format(cdr_ids_str), sql_con)
-    df_2 = df_of_tables_for_dd_ids(list(df.dd_id), [x for x in sqlite_tables if x != 'dd_id_to_cdr_id'], sql_con)
+    df_2 = _df_of_tables_for_dd_ids(list(df.dd_id.unique()), [x for x in sqlite_tables if x != 'dd_id_to_cdr_id'],
+                                    sql_con)
 
     return df.merge(df_2, on=['dd_id'], how='outer')
-
-
-def get_phones_for_dd_ids(dd_ids, sql_con=None):
-    """
-    :param list dd_ids: List of Deep Dive IDs
-    :param sqlalchemy.create_engine sql_con: Connection to SQLite (can be \
-    omitted)
-    :returns: `pandas.DataFrame` -- Data Frame of Deep Dive IDs and the phone \
-    numbers assigned to them.
-    """
-    return df_of_tables_for_dd_ids(dd_ids, ['dd_id_to_phone'], sql_con)

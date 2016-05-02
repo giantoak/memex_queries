@@ -1,9 +1,10 @@
-from .cdr import cdr_ad_ids_for_cdr_image_ids
-from .cdr import cdr_fields_for_cdr_ids
-from .cdr import cdr_image_ids_for_cdr_ad_ids
-from .hbase import hbase_row_value
-from .dd_sqlite import df_of_tables_for_cdr_ad_ids
-from .dd_sqlite import df_of_tables_for_dd_ids
+from isi.hbase import cdr_ad_ids_for_image_hash
+from isi.hbase import image_hash_for_cdr_image_id
+from ist.cdr import cdr_ad_ids_for_cdr_image_ids
+from ist.cdr import cdr_fields_for_cdr_ids
+from ist.cdr import cdr_image_ids_for_cdr_ad_ids
+from lattice.sqlite import df_of_tables_for_cdr_ad_ids
+from uncharted.hbase import image_hash_for_memex_ht_id
 import pandas as pd
 
 
@@ -19,13 +20,12 @@ def cdr_ad_ids_for_hashed_cdr_image_id(cdr_image_id, es=None):
 
     # Check Svebor's table for a copy of the hashed image
     # and the ads in which it was used
-    ad_ids = hbase_row_value('ht_images_infos_2016',
-                             cur_hash,
-                             'info:all_parent_ids')
+    ad_ids = cdr_ad_ids_for_image_hash(cur_hash)
     if ad_ids is not None:
-        return ad_ids.split(',')
+        return ad_ids
 
-    # Our fallback is to hit elastic and get every parent of the *specific* current image
+    # Our fallback is to hit elastic and get every parent of
+    # the *specific* current image
     return cdr_ad_ids_for_cdr_image_ids([cdr_image_id], es)[0]
 
 
@@ -41,27 +41,24 @@ def image_hashes(cdr_image_ids, es=None):
     """
     import requests
 
-    # this is a stupid workaround; should use a list
-    hash_dict = dict()
-
-    # Check Svebor's hash lookup table
-    # Return if we find everything
-    for cdr_image_id in cdr_image_ids:
-        hash_dict[cdr_image_id] = hbase_row_value('ht_images_cdrid_to_sha1_2016',
-                                                  cdr_image_id,
-                                                  'hash:sha1')
+    # Populate hash dict with ISI table data
+    hash_dict = {cdr_image_id: image_hash_for_cdr_image_id(cdr_image_id)
+                 for cdr_image_id in cdr_image_ids}
 
     missing_image_cdr_ids = [x for x in hash_dict if hash_dict[x] is None]
     if len(missing_image_cdr_ids) == 0:
         return [hash_dict[cdr_image_id] for cdr_image_id in cdr_image_ids]
 
     # Hit the CDR for original URLs and lookup ids for image_hash
-    data_dict = cdr_fields_for_cdr_ids(missing_image_cdr_ids, ['crawl_data.image_id', 'obj_stored_url'], es)
+    data_dict = cdr_fields_for_cdr_ids(missing_image_cdr_ids,
+                                       ['crawl_data.image_id',
+                                        'obj_stored_url'],
+                                       es)
     for cdr_image_id in data_dict:
         if 'crawl_data.image_id' in data_dict[cdr_image_id]:
-            hash_dict[cdr_image_id] = hbase_row_value('image_hash',
-                                                      data_dict[cdr_image_id]['crawl_data.image_id'],
-                                                      'image:hash')
+            hash_dict[cdr_image_id] =\
+                image_hash_for_memex_ht_id(
+                    data_dict[cdr_image_id]['crawl_data.image_id'])
 
         if hash_dict[cdr_image_id] is None:
             if 'obj_stored_url' not in data_dict:
@@ -98,10 +95,6 @@ def post_dates_for_cdr_ad_ids(cdr_ad_ids):
     :returns: `pandas.DataFrame` -- DataFrame of CDR IDs, DD IDs, and Post Dates
     """
     return df_of_tables_for_cdr_ad_ids(cdr_ad_ids, ['dd_id_to_post_date'])
-    # return dd_id_df(cdr_ad_ids).join(df_of_tables_for_dd_ids(
-    #     [dd_id_from_cdr_id(x) for x in cdr_ad_ids],
-    #     ['dd_id_to_post_date']
-    # ), on=['dd_id'])
 
 
 def post_dates_for_hashed_cdr_image_id(cdr_image_id, es=None):
@@ -120,25 +113,13 @@ def post_dates_for_hashed_cdr_image_id(cdr_image_id, es=None):
     return post_dates_for_cdr_ad_ids(cdr_ad_ids)
 
 
-def cdr_image_ids_for_dd_ad_id(dd_ad_id):
-    """
-    :param int dd_ad_id: The Deep Dive ID of an escort ad.
-    :returns: `list` -- The list of CDR IDs of the images used with this ad.
-    """
-    # The HBase table isn't yet fully populated, so we use sqlite
-    # cdr_ad_id = hbase_row_value('deepdive_escort_ads', dd_ad_id, 'info:cdr_id')
-    cdr_ad_id = df_of_tables_for_dd_ids([dd_ad_id], ['dd_id_to_cdr_id']).iloc[0, 1]
-    ad_image_dict = cdr_image_ids_for_cdr_ad_ids(cdr_ad_id)
-    return ad_image_dict[cdr_ad_id]
-
-
-def df_of_tables_for_cdr_image_ids(cdr_image_ids, sqlite_tables):
+def df_of_tables_for_cdr_image_ids(cdr_image_ids, dd_tables):
     """
     :param list cdr_image_ids: List of CDR IDs for images.
-    :param list sqlite_tables: List of target SQLite / Deep Dive tables.
+    :param list dd_tables: List of target SQLite / Deep Dive tables.
     :returns: `pandas.DataFrame` -- DataFrame of CDR Image IDS, CDR Ad IDS, DD IDs, and other desired tables.
     """
     cdr_ad_ids = cdr_ad_ids_for_cdr_image_ids(cdr_image_ids)
     ad_image_df = pd.DataFrame({'cdr_id': cdr_ad_ids, 'cdr_image_id': cdr_image_ids})
-    df = df_of_tables_for_cdr_ad_ids(cdr_ad_ids, sqlite_tables)
+    df = df_of_tables_for_cdr_ad_ids(cdr_ad_ids, dd_tables)
     return ad_image_df.join(df, on='cdr_id')
