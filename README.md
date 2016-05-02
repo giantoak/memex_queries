@@ -90,16 +90,7 @@ Functions for interacting with resources provided by Uncharted.
 (Currently includes an HBase table.)
 
 #### [`memex_queries/helpers/__init__.py`](https://github.com/giantoak/memex_queries/blob/master/memex_queries/helpers/__init__.py)
-Functions that interact with data stores provided by different teams.
-
-#### [`memex_queries/helpers/cdr.py`](https://github.com/giantoak/memex_queries/blob/master/memex_queries/helpers/cdr.py)
-Functions for interacting with the CDR
-
-#### [`memex_queries/helpers/hbase.py`](https://github.com/giantoak/memex_queries/blob/master/memex_queries/helpers/hbase.py)
-Functions for interacting with HBase
-
-### [`memex_queries/helpers/sqlite.py`](https://github.com/giantoak/memex_queries/blob/master/memex_queries/helpers/sqlite.py)
-Functions for interacting with SQLite
+Functions that interact with multiple data stores provided by different teams.
 
 ## Setup stuff
 ### [`make_dd_sqlite_db.sql`](https://github.com/giantoak/memex_queries/blob/master/make_dd_sqlite_db.sql)
