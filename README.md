@@ -2,14 +2,17 @@
 
 This repository contains a Python module for calculating stats against a wide
 variety of MEMEX escort data. It exists because MEMEX data is scattered
-across multiple resources and knowledge sharing remains hard. `memex_queries`
-abstracts away as many of these data stores as possible.
+across multiple resources maintained by different teams  and knowledge sharing
+is hard. `memex_queries` abstracts away as many of these data stores as
+possible.
 
-In the present implementation, this means that queries to various MEMEX
-[HBase] tables, the [Elasticsearch] CDR, and [Hive] and [Impala] for
-useful datatables are hidden away in low level functions within helper
-modules. These functions can be used to compose high-level queries that
-are primarily concerne with data, not where it has been stored.
+In the present implementation, this means that queries to MEMEX resources
+created by different teams ([HBase] tables, the [Elasticsearch] CDR,
+[Hive] and [Impala] data bases, all either *on* or *off* the MEMEX cluster)
+are hidden away in low level functions within helper modules.
+These functions can be used to compose high-level queries that cut across
+these different data stores  are primarily concerne with data, not where
+it has been stored.
 
 The module is organized as follows:
 
@@ -64,11 +67,30 @@ where:
 >   return list(data_related_to_ads)
 ```
 
-Helper functions are broken down across four files:
+Helper functions are broken down across subpackages for each team:
+
+#### [`memex_queries/helpers/giantoak/`](https://github.com/giantoak/memex_queries/blob/master/memex_queries/helpers/giantoak)
+Functions for interacting with resources provided by Giant Oak.
+(Currently nil.)
+
+#### [`memex_queries/helpers/isi/`](https://github.com/giantoak/memex_queries/blob/master/memex_queries/helpers/isi)
+Functions for interacting with resources provided by Columbia and ISI.
+(Currently HBase tables, should also include an Elasticsearch instance.)
+
+#### [`memex_queries/helpers/ist/`](https://github.com/giantoak/memex_queries/blob/master/memex_queries/helpers/ist)
+Functions for interacting with resources provided by IST.
+(Currently the CDR.)
+
+#### [`memex_queries/helpers/jpl/`](https://github.com/giantoak/memex_queries/blob/master/memex_queries/helpers/jpl)
+Functions for interacting with resources provided by JPL.
+(Currently nil, should include Solr / Image Space.)
+
+#### [`memex_queries/helpers/uncharted/`](https://github.com/giantoak/memex_queries/blob/master/memex_queries/helpers/giantoak)
+Functions for interacting with resources provided by Uncharted.
+(Currently includes an HBase table.)
 
 #### [`memex_queries/helpers/__init__.py`](https://github.com/giantoak/memex_queries/blob/master/memex_queries/helpers/__init__.py)
-Functions that interact with mulitple data stores. We try to prioritise the
-local SQLite DB first, then HBase, then the CDR / Elasticsearch.
+Functions that interact with data stores provided by different teams.
 
 #### [`memex_queries/helpers/cdr.py`](https://github.com/giantoak/memex_queries/blob/master/memex_queries/helpers/cdr.py)
 Functions for interacting with the CDR
