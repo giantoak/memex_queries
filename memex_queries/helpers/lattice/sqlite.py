@@ -69,6 +69,9 @@ def df_of_tables_for_cdr_ad_ids(cdr_ad_ids, sqlite_tables, sql_con=None):
     """
     from pandas import read_sql
 
+    if cdr_ad_ids is None:
+        cdr_ad_ids = []
+
     if isinstance(cdr_ad_ids, (str, unicode)):
         cdr_ad_ids = [cdr_ad_ids]
 

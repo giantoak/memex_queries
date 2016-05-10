@@ -15,7 +15,10 @@ def query_one(cdr_image_id):
     :param elasticsearch.Elasticsearch es: An elasticsearch connection
     :returns: `pandas.tslib.Timestamp` --
     """
-    return min(post_dates_for_hashed_cdr_image_id(cdr_image_id).post_date)
+    vals = post_dates_for_hashed_cdr_image_id(cdr_image_id)
+    if vals is None or len(vals) == 0:
+        return None
+    return min(vals.post_date)
 
 
 def query_two(cdr_image_id):
