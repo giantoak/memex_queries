@@ -1,6 +1,8 @@
 SQLITE_FILE = 'dd_dump_v2.db'
 local_sqlite = None
 
+feature_mapping_dict = {'phone': 'dd_id_to_phone',
+                        'post_date': 'dd_id_to_post_date'}
 
 def _new_sqlite_con():
     """
@@ -58,7 +60,7 @@ def _df_of_phones_for_dd_ids(dd_ids, sql_con=None):
     return _df_of_tables_for_dd_ids(dd_ids, ['dd_id_to_phone'], sql_con)
 
 
-def df_of_tables_for_cdr_ad_ids(cdr_ad_ids, sqlite_tables, sql_con=None):
+def _df_of_tables_for_cdr_ad_ids(cdr_ad_ids, sqlite_tables, sql_con=None):
     """
     :param unicode|str|list cdr_ad_ids: list of CDR Ad IDs to match with deep dive data
     :param list sqlite_tables: list of SQLite tables to join
@@ -85,3 +87,26 @@ def df_of_tables_for_cdr_ad_ids(cdr_ad_ids, sqlite_tables, sql_con=None):
                                     sql_con)
 
     return df.merge(df_2, on=['dd_id'], how='outer')
+
+
+def df_of_features_for_cdr_ad_ids(cdr_ad_ids, features, sql_con=None):
+    """
+    :param unicode|str|list cdr_ad_ids: list of CDR Ad IDs to match with deep dive data
+    :param list|str features: list of features to include, single feature if str or
+    :param sqlalchemy.create_engine sql_con: Connection to SQLite (can be \
+    omitted)
+    :returns: `pandas.DataFrame` -- dataframe of tables, joined using the Deep \
+    Dive IDs.
+    """
+    if isinstance(features, (str, unicode)):
+        features = [features]
+
+    for x in features:
+        if x not in feature_mapping_dict:
+            raise KeyError('No feature named "{}"'.format(x))
+
+    return _df_of_tables_for_cdr_ad_ids(cdr_ad_ids,
+                                        [feature_mapping_dict[x]
+                                         for x in features],
+                                        sql_con)
+

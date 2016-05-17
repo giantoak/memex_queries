@@ -2,7 +2,7 @@ import datetime as dt
 from .helpers import post_dates_for_hashed_cdr_image_id
 from .helpers import cdr_ad_ids_for_hashed_cdr_image_id
 from .helpers.ist.cdr import cdr_image_ids_for_cdr_ad_ids
-from .helpers.lattice.sqlite import df_of_tables_for_cdr_ad_ids
+from .helpers.lattice.sqlite import df_of_features_for_cdr_ad_ids
 from itertools import chain
 
 
@@ -30,7 +30,7 @@ def query_two(cdr_image_id):
     :returns: `set` --
     """
     cdr_ad_ids = cdr_ad_ids_for_hashed_cdr_image_id(cdr_image_id)
-    df = df_of_tables_for_cdr_ad_ids(cdr_ad_ids, ['dd_id_to_phone', 'dd_id_to_post_date'])
+    df = df_of_features_for_cdr_ad_ids(cdr_ad_ids, ['phone', 'post_date'])
     first_date = df.post_date.min()
 
     return set(df.ix[(df.post_date == first_date), 'phone'].values)
@@ -46,7 +46,7 @@ def query_three(cdr_image_id, post_date):
     :returns: `set` --
     """
     cdr_ad_ids = cdr_ad_ids_for_hashed_cdr_image_id(cdr_image_id)
-    df = df_of_tables_for_cdr_ad_ids(cdr_ad_ids, ['dd_id_to_phone', 'dd_id_to_post_date'])
+    df = df_of_features_for_cdr_ad_ids(cdr_ad_ids, ['phone', 'post_date'])
 
     if isinstance(post_date, (str, unicode)):
         from pandas import to_datetime
@@ -75,7 +75,7 @@ def query_five(cdr_image_id):
     :returns: `set` --
     """
     cdr_ad_ids = cdr_ad_ids_for_hashed_cdr_image_id(cdr_image_id)
-    df = df_of_tables_for_cdr_ad_ids(cdr_ad_ids, ['dd_id_to_phone'])
+    df = df_of_features_for_cdr_ad_ids(cdr_ad_ids, ['phone'])
     return set(df.phone)
 
 
@@ -101,7 +101,7 @@ def query_seven(cdr_image_id, post_date, phone_number=None):
     :returns: --
     """
     cdr_ad_ids = cdr_ad_ids_for_hashed_cdr_image_id(cdr_image_id)
-    df = df_of_tables_for_cdr_ad_ids(cdr_ad_ids, ['dd_id_to_phone', 'dd_id_to_post_date'])
+    df = df_of_features_for_cdr_ad_ids(cdr_ad_ids, ['phone', 'post_date'])
 
     if isinstance(post_date, (str, unicode)):
         post_date = dt.datetime(post_date)
@@ -141,7 +141,7 @@ def query_nine(cdr_ad_id, phone_number=None):
     cdr_ad_ids = list(set(chain(*[cdr_ad_ids_for_hashed_cdr_image_id(cdr_image_id)
                                   for cdr_image_id in cdr_image_ids])
                           ))
-    df = df_of_tables_for_cdr_ad_ids(cdr_ad_ids, ['dd_id_to_phone', 'dd_id_to_post_date'])
+    df = df_of_features_for_cdr_ad_ids(cdr_ad_ids, ['phone', 'post_date'])
 
     if phone_number is None:
         phone_numbers = df.ix[df.cdr_id == cdr_ad_id, 'phone'].tolist()
