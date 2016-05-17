@@ -159,7 +159,7 @@ def query_ten(cdr_ad_id):
     """
 
 
-def query_eleven(cdr_image_id, epochtime=None, es=None):
+def query_eleven(cdr_image_id, epochtime=None):
     """
     For a given `cdr_image_id` posted at `epochtime`, how long has it been since \
     the image was last posted?
@@ -168,10 +168,9 @@ def query_eleven(cdr_image_id, epochtime=None, es=None):
     :param int epochtime: if None, assume we're talking about the gap between \
     the most and second-most recent instance. If an int, find the first \
     timestamp BEFORE the one provided.
-    :param elasticsearch.Elasticsearch es:
     :returns: `int` -- epochtime since the last posting
     """
-    ad_timestamps = sorted(post_dates_for_hashed_cdr_image_id(cdr_image_id, es))
+    ad_timestamps = sorted(post_dates_for_hashed_cdr_image_id(cdr_image_id))
 
     if epochtime is None:
         # If there's been no postings, the gap is infinite
