@@ -11,8 +11,7 @@ def query_one(cdr_image_id):
     For the general version of a given `cdr_image_id`, return the first \
     date that it was posted in an ad.
 
-    :param str cdr_image_id: The CDR ID of the image to retrieve
-    :param elasticsearch.Elasticsearch es: An elasticsearch connection
+    :param str | unicode cdr_image_id: The CDR ID of the image to retrieve
     :returns: `pandas.tslib.Timestamp` --
     """
     vals = post_dates_for_hashed_cdr_image_id(cdr_image_id)
@@ -27,7 +26,7 @@ def query_two(cdr_image_id):
     (or numbers) posted ads using `cdr_image_id` on the first date \
     that it was posted in an ad?
 
-    :param str cdr_image_id: The CDR ID of the image to retrieve
+    :param str | unicode cdr_image_id: The CDR ID of the image to retrieve
     :returns: `set` --
     """
     cdr_ad_ids = cdr_ad_ids_for_hashed_cdr_image_id(cdr_image_id)
@@ -42,8 +41,8 @@ def query_three(cdr_image_id, post_date):
     For a given `cdr_image_id` at `post_date`, **what** phone numbers posted \
     ads with `cdr_image_id` at an earlier date?
 
-    :param str cdr_image_id: The CDR ID of the image to retrieve
-    :param str|datetime.datetime post_date: Date against which to check
+    :param str | unicode cdr_image_id: The CDR ID of the image to retrieve
+    :param str | datetime.datetime post_date: Date against which to check
     :returns: `set` --
     """
     cdr_ad_ids = cdr_ad_ids_for_hashed_cdr_image_id(cdr_image_id)
@@ -61,8 +60,8 @@ def query_four(cdr_image_id, post_date):
     For a given `cdr_image_id` at `post_date`,
     HOW MANY phone numbers posted ads with I at an earlier date?
 
-    :param str cdr_image_id: The CDR ID of the image to retrieve
-    :param str|datetime.datetime post_date: Date against which to check
+    :param str | unicode cdr_image_id: The CDR ID of the image to retrieve
+    :param str | datetime.datetime post_date: Date against which to check
     :returns: `int` --
     """
     return len(query_three(cdr_image_id, post_date))
@@ -72,7 +71,7 @@ def query_five(cdr_image_id):
     """
     For a given cdr_image_id, what phone numbers posted ads using it?
 
-    :param str cdr_image_id: The CDR ID of the image to retrieve
+    :param str | unicode cdr_image_id: The CDR ID of the image to retrieve
     :returns: `set` --
     """
     cdr_ad_ids = cdr_ad_ids_for_hashed_cdr_image_id(cdr_image_id)
@@ -84,7 +83,7 @@ def query_six(cdr_image_id):
     """
     For a given cdr_image_id, how many phone numbers posted ads using it?
 
-    :param str cdr_image_id: The CDR ID of the image to retrieve
+    :param str | unicode cdr_image_id: The CDR ID of the image to retrieve
     :returns: `int` --
     """
     return len(query_five(cdr_image_id))
@@ -96,9 +95,9 @@ def query_seven(cdr_image_id, post_date, phone_number=None):
     what phone numbers **other than `phone_number`** posted ads with \
     `cdr_image_id` at an earlier date?
 
-    :param str cdr_image_id: The CDR ID of the image to retrieve
-    :param str|datetime.datetime post_date: Date against which to check
-    :param str phone_number:
+    :param str | unicode cdr_image_id: The CDR ID of the image to retrieve
+    :param str | unicode | datetime.datetime post_date: Date against which to check
+    :param str | unicode phone_number:
     :returns: --
     """
     cdr_ad_ids = cdr_ad_ids_for_hashed_cdr_image_id(cdr_image_id)
@@ -119,9 +118,9 @@ def query_eight(cdr_image_id, post_date, phone_number=None):
     **how many** phone numbers other than `phone_number`-posted ads with \
     `cdr_image_id` at an earlier date?
 
-    :param str cdr_image_id: The CDR ID of the image to retrieve
-    :param str|datetime.datetime post_date: Date against which to check
-    :param str phone_number:
+    :param str | unicode cdr_image_id: The CDR ID of the image to retrieve
+    :param str | unicode | datetime.datetime post_date: Date against which to check
+    :param str | unicode phone_number:
     :returns: `int` --
     """
     return len(query_seven(cdr_image_id, post_date, phone_number))
@@ -132,8 +131,8 @@ def query_nine(cdr_ad_id, phone_number=None):
     For a given `cdr_ad_id` posted by `phone_number` what fraction of the \
     images were first used in ads posted by by phone numbers other than P?
 
-    :param str cdr_ad_id: The CDR ID of an ad
-    :param str phone_number: The phone_number to use. if None, use all of \
+    :param str | unicode cdr_ad_id: The CDR ID of an ad
+    :param str | unicode phone_number: The phone_number to use. if None, use all of \
     the numbers extracted from the ad.
     :returns: --
     """
@@ -155,7 +154,7 @@ def query_ten(cdr_ad_id):
     For all of the images affiliated with a given `cdr_ad_id`, if you find which \
     phone number originated each ad, how many total sources does the ad have?
 
-    :param str cdr_ad_id: The CDR ID of an ad
+    :param str | unicode cdr_ad_id: The CDR ID of an ad
     :returns: --
     """
 
@@ -165,7 +164,7 @@ def query_eleven(cdr_image_id, epochtime=None, es=None):
     For a given `cdr_image_id` posted at `epochtime`, how long has it been since \
     the image was last posted?
 
-    :param str cdr_image_id: The CDR ID of the image to retrieve
+    :param str | unicode cdr_image_id: The CDR ID of the image to retrieve
     :param int epochtime: if None, assume we're talking about the gap between \
     the most and second-most recent instance. If an int, find the first \
     timestamp BEFORE the one provided.
@@ -196,7 +195,7 @@ def query_twelve(cdr_image_id):
     """
     For a given `cdr_image_id`, what is its radius of gyration?
 
-    :param str cdr_image_id: The CDR ID of the image to retrieve
+    :param str | unicode cdr_image_id: The CDR ID of the image to retrieve
     :returns:  --
     """
 
@@ -214,7 +213,7 @@ def query_fourteen(cdr_ad_id):
     For a given cdr_ad_id posted at time T,
     what fraction of the images have not been used in prior ads?
 
-    :param str cdr_ad_id: The CDR ID of an ad
+    :param str | unicode cdr_ad_id: The CDR ID of an ad
     :returns:  --
     """
 
@@ -224,7 +223,7 @@ def query_fifteen(cdr_ad_id):
     For a given `cdr_ad_id` posted at time T, what is the mean number of
     times images in the ad have appeared before?
 
-    :param str cdr_ad_id: The CDR ID of an ad
+    :param str | unicode cdr_ad_id: The CDR ID of an ad
     :returns:  --
     """
 
@@ -234,7 +233,7 @@ def query_sixteen(cdr_ad_id):
     For a given `cdr_ad_id`, what is the mean amount time since ads in the \
     photos first appeared?
 
-    :param str cdr_ad_id: The CDR ID of an ad
+    :param str | unicode cdr_ad_id: The CDR ID of an ad
     :returns:  --
     """
 
@@ -244,7 +243,7 @@ def query_seventeen(cdr_image_id):
     For a given `cdr_image_id`, what is the median price in all ads using \
     this photo?
 
-    :param str cdr_image_id: The CDR ID of the image to retrieve
+    :param str | unicode cdr_image_id: The CDR ID of the image to retrieve
     :returns:  --
     """
 
@@ -254,7 +253,7 @@ def query_eighteen(cdr_image_id):
     For a given `cdr_image_id`, what proportion of ads including that image offer \
     outcall services?
 
-    :param str cdr_image_id: The CDR ID of the image to retrieve
+    :param str | unicode cdr_image_id: The CDR ID of the image to retrieve
     :returns:  --
     """
 
@@ -264,7 +263,7 @@ def query_nineteen(cdr_image_id):
     For a given `cdr_image_id`, what is the Lat-long of the centroid defined by \
     the locations provided for the advertisements in which I has been used?
 
-    :param str cdr_image_id: The CDR ID of the image to retrieve
+    :param str | unicode cdr_image_id: The CDR ID of the image to retrieve
     :returns:  --
     """
 
@@ -275,7 +274,7 @@ def query_twenty(cdr_image_id):
     Photo Gap (query_eleven) that has been seen for any use of the I in \
     prior ads?
 
-    :param str cdr_image_id: The CDR ID of the image to retrieve
+    :param str | unicode cdr_image_id: The CDR ID of the image to retrieve
     :returns:  --
     """
 
@@ -295,7 +294,7 @@ def query_twenty_two(cdr_ad_id):
     For a given `ad_id` with a set of images (I), what is the first date on \
     which an ad using exactly (I) appeared?
 
-    :param str cdr_ad_id: The CDR ID of an ad
+    :param str | unicode cdr_ad_id: The CDR ID of an ad
     :returns:  --
     """
 
@@ -305,7 +304,7 @@ def query_twenty_three(cdr_ad_id):
     For a given `ad_id` with a set of images (I), what is the first date on \
     which an ad using (I) or a superset of (I) appeared?
 
-    :param str cdr_ad_id: The CDR ID of an ad
+    :param str | unicode cdr_ad_id: The CDR ID of an ad
     :returns:  --
     """
 
@@ -315,7 +314,7 @@ def query_twenty_four(cdr_ad_id):
     For a given `cdr_ad_id` with a set of images (I) posted at time T, how \
     many prior ads have used exactly (I)?
 
-    :param str cdr_ad_id: The CDR ID of an ad
+    :param str | unicode cdr_ad_id: The CDR ID of an ad
     :returns:  --
     """
 
@@ -325,6 +324,6 @@ def query_twenty_five(cdr_ad_id):
     For a given `cdr_ad_id` with a set of images (I) posted at time T, how \
     many prior ads have used (I) or a superset of (I)?
 
-    :param str cdr_ad_id: The CDR ID of an ad
+    :param str | unicode cdr_ad_id: The CDR ID of an ad
     :returns:  --
     """
