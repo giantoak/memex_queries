@@ -1,11 +1,14 @@
-CDR_URL = 'els.istresearch.com:19200/memex-domains'
+CDR_URL = 'cdr-es.istresearch.com:9200/memex-domains'
 CDR_INDEX = 'escorts'
-CDR_AUTH_TUPLE = ('memex', 'qRJfu2uPkMLmH9cp')
+CDR_AUTH_TUPLE = ('cdr-memex', 's7Zhd71r3VD8ojRj')
 
 cdr_url = 'https://{}:{}@{}/{}/'.format(CDR_AUTH_TUPLE[0],
                                         CDR_AUTH_TUPLE[1],
                                         CDR_URL,
                                         CDR_INDEX)
+
+cdr_search_url = cdr_url+'_search?'
+
 local_es = None
 
 
