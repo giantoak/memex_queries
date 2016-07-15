@@ -1,11 +1,15 @@
 CDR_URL = 'cdr-es.istresearch.com:9200/memex-domains'
+CDR_PORT = 9200
+CDR_MAPPING = 'memex-domains'
 CDR_INDEX = 'escorts'
 CDR_AUTH_TUPLE = ('cdr-memex', 's7Zhd71r3VD8ojRj')
 
-cdr_url = 'https://{}:{}@{}/{}/'.format(CDR_AUTH_TUPLE[0],
-                                        CDR_AUTH_TUPLE[1],
-                                        CDR_URL,
-                                        CDR_INDEX)
+cdr_url = 'https://{}@{}/{}/'.format('{}:{}'.format(CDR_AUTH_TUPLE[0],
+                                                    CDR_AUTH_TUPLE[1]),
+                                     '{}:{}'.format(CDR_URL,
+                                                    CDR_PORT),
+                                     '/'.join([CDR_MAPPING,
+                                               CDR_INDEX]))
 
 cdr_search_url = cdr_url+'_search?'
 
@@ -31,7 +35,10 @@ def _new_elasticsearch():
     from elasticsearch import Elasticsearch
     global local_es
     if local_es is None:
-        local_es = Elasticsearch(cdr_url)
+        local_es = Elasticsearch(cdr_url,
+                                 timeout=30,
+                                 max_retries=10,
+                                 retry_on_timeout=True)
 
     return local_es
 

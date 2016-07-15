@@ -20,9 +20,24 @@ def _hbase_row_value(table, row_id, key_id):
     return None
 
 
+def similar_images_for_cdr_image_id(cdr_image_id, with_scores=False):
+    """
+    :param str cdr_image_id: CDR ID of an image
+    :param bool with_scores: if True, return
+    :returns: `list[str]` | `dict[str, float]` -- list of CDR image IDs
+    or dict keying CDR image IDs to similarity scores.
+    """
+    memex_ht_id = _hbase_row_value('ht_images_cdrid_to_image_ht_id',
+                                   cdr_image_id,
+                                   'info:crawl_data.memex_ht_id')
+
+    _hbase_row_value('aaron_memex_ht-images', memex_ht_id, 'meta:columbia_near_dups')
+
+
+
 def image_hash_for_cdr_image_id(cdr_image_id):
     """
-    :param cdr_image_id: CDR ID of an image
+    :param str cdr_image_id: CDR ID of an image
     :returns: `str` -- SHA1 Hash of image or None, if not in HBase
     """
     cdr_id_to_sha_tables = ['ht_images_cdrid_to_sha1_2016',
