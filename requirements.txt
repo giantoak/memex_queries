@@ -1,6 +1,7 @@
 python=2.7
 certifi
 elasticsearch
+happybase
 pandas
 requests
 sqlalchemy
