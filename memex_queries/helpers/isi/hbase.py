@@ -31,7 +31,9 @@ def similar_images_for_cdr_image_id(cdr_image_id, with_scores=False):
                                    cdr_image_id,
                                    'info:crawl_data.memex_ht_id')
 
-    _hbase_row_value('aaron_memex_ht-images', memex_ht_id, 'meta:columbia_near_dups')
+    return _hbase_row_value('aaron_memex_ht-images',
+                            memex_ht_id,
+                            'meta:columbia_near_dups')
 
 
 
@@ -40,7 +42,8 @@ def image_hash_for_cdr_image_id(cdr_image_id):
     :param str cdr_image_id: CDR ID of an image
     :returns: `str` -- SHA1 Hash of image or None, if not in HBase
     """
-    cdr_id_to_sha_tables = ['ht_images_cdrid_to_sha1_2016',
+    cdr_id_to_sha_tables = ['escorts_images_cdrid_infos'
+                            'ht_images_cdrid_to_sha1_2016',
                             'ht_images_cdrid_to_sha1_2016_old_crawler',
                             'ht_images_cdrid_to_sha1_qpr_Apr2016_CP4',
                             'ht_images_cdrid_to_sha1_sample']
