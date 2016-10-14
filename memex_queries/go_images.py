@@ -1,7 +1,7 @@
 import datetime as dt
 from .helpers import post_dates_for_hashed_cdr_image_id
 from .helpers import cdr_ad_ids_for_hashed_cdr_image_id
-from .helpers.ist.cdr import cdr_image_ids_for_cdr_ad_ids
+from .helpers.memex.cdr import cdr_image_ids_for_cdr_ad_ids
 from .helpers.lattice.sqlite import df_of_features_for_cdr_ad_ids
 from itertools import chain
 
