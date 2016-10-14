@@ -1,4 +1,4 @@
-CDR_URL = 'cdr-es.istresearch.com:9200/memex-domains'
+CDR_URL = 'cdr-es.istresearch.com'
 CDR_PORT = 9200
 CDR_MAPPING = 'memex-domains'
 CDR_INDEX = 'escorts'
@@ -14,7 +14,6 @@ cdr_url = 'https://{}@{}/{}/'.format('{}:{}'.format(CDR_AUTH_TUPLE[0],
 cdr_search_url = cdr_url+'_search?'
 
 local_es = None
-
 
 def _filter_terms_query(query_dict):
     """
@@ -32,13 +31,16 @@ def _new_elasticsearch():
     """
     :returns: `elasticsearch.Elasticsearch` -- An active connection to the CDR
     """
+    import certifi
     from elasticsearch import Elasticsearch
     global local_es
     if local_es is None:
         local_es = Elasticsearch(cdr_url,
                                  timeout=30,
                                  max_retries=10,
-                                 retry_on_timeout=True)
+                                 retry_on_timeout=True,
+                                 verify_certs=True,
+                                 ca_certs=certifi.where())
 
     return local_es
 
