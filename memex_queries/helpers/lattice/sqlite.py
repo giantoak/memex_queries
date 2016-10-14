@@ -1,18 +1,21 @@
-SQLITE_FILE = 'dd_dump_v2.db'
+BASE_DB = 'dd_dump_v2.db'
+HOMOLOGY_DB = 'homology_160722.db'
 local_sqlite = None
 
 feature_mapping_dict = {'phone': 'dd_id_to_phone',
                         'post_date': 'dd_id_to_post_date'}
 
-def _new_sqlite_con():
+
+def _new_sqlite_con(dbpath=BASE_DB):
     """
+    :param str dbpath: path to SQLite DB; defaults to `BASE_DB`
     :returns: `sqlalchemy.create_engine` -- Connection to the SQLite database.
     """
     from sqlalchemy import create_engine
 
     global local_sqlite
     if local_sqlite is None:
-        local_sqlite = create_engine('sqlite:///{}'.format(SQLITE_FILE))
+        local_sqlite = create_engine('sqlite:///{}'.format(dbpath))
 
     return local_sqlite
 
