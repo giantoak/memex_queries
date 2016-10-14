@@ -1,5 +1,7 @@
-elasticsearch=2.3
-pandas=0.18.0
-requests=2.9.1
-sqlalchemy=1.0.12
-sqlite=3.9.2
+python=2.7
+certifi
+elasticsearch
+pandas
+requests
+sqlalchemy
+sqlite
